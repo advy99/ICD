@@ -2,8 +2,8 @@
 require(ISLR)
 require(MASS)
 
-install.packages("ISLR")
-install.packages("MASS")
+#install.packages("ISLR")
+#install.packages("MASS")
 
 # Leemos los datos
 California <- read.csv("data/california.dat", comment.char = "@", header = FALSE)
@@ -148,7 +148,7 @@ summary(fit3)
 # dado por el R-squared.
 
 # la caracteristica con menor p-value era Households
-fit4 = lm(MedianHouseValue ~ . - Households, data = California) #TODAS para descendente
+fit4 = lm(MedianHouseValue ~ . - Households, data = California)
 summary(fit4)
 
 # Con esto pasamos de un R-squared de 0.637 a uno de 0.6363, manteniendo en
@@ -160,5 +160,72 @@ summary(fit4)
 # con households, ya que al existir esa correlación es probable que estuvieran explicando
 # la misma parte del modelo, por lo que se podría simplificar sin perder información.
 
+# Households tiene una correlación muy alta con TotalBedrooms y Population,
+# por lo que en principio podríamos dejar solo una de estas dos
+fit5 = lm(MedianHouseValue ~ . - Households - TotalBedrooms, data = California) 
+summary(fit5)
 
-#interactions
+# Con esto pasamos de un R-squared de 0.6363 a uno de 0.6112, manteniendo en
+# las demás caracteristicas un p-value < 2e-16, podríamos eliminar esta variable 
+# si queremos un modelo más explicable perdiendo tan solo un 2% de información.
+
+# Llegados a este punto podríamos parar, ya que todas las variables cuantan con un buen
+# p-value, indicando una relación lineal con la caracteristica de salida,
+# e intentar reducir el número de predictores solo nos lleva a bajar el R-squared
+
+
+
+#
+# INTERACCIONES
+#
+
+# antes se ha graficado unicamente el mapa de correlaciones del dataset. También 
+# podemos graficar las variables unas respecto a otras:
+
+ggpairs(California)
+
+# como vemos, en algunas variables existe una gran interacción, como por ejemplo
+# la ya comentada TotalBedrooms y Household, TotalRooms y TotalBedrooms (como era de esperar),
+# entre otras.
+# Con esto, a partir del mejor modelo obtenido con regresión lineal multiple
+# vamos a intentar mejorarlo con interacciones.
+
+# Escogeré como mejor modelo el que contenia todas las caracteristicas, ya que 
+# obteniamos un mejor R-squared y además debido a las interacciones que vamos a
+# probar tendría que añadir igualmente las caracteristicas que probe a eliminar
+# por el principio de la jerarquia
+
+# como vemos en la gráfica, hay interacciones entre TotalBedrooms, Households
+fit6 = lm(MedianHouseValue ~ . + TotalBedrooms * Households, data = California) 
+summary(fit6)
+
+# Si graficamos también esta nueva caracteristica con las demás, podemos ver
+# que también hay una relación entre esta nueva y Population
+ggpairs(cbind(California, California$TotalBedrooms * California$Households))
+
+fit7 = lm(MedianHouseValue ~ . + TotalBedrooms * Households * Population, data = California) 
+summary(fit7)
+
+# con este nuevo termino vemos que el p-value es de 0.444, por lo que no existe 
+# una dependencia lineal y no aporta mucho, esta interacción no ha funcionado y
+# habría que eliminarla
+
+# voy a probar a cambiarlo por MedianIncome, que también parece mostrar una relacion
+fit8 = lm(MedianHouseValue ~ . + TotalBedrooms * Households * MedianIncome, data = California) 
+summary(fit8)
+
+# en este caso si ha resultado de interes, subiendo el adjusted R-squared a 0.6429
+# y con un p-value que nos indica que existe relación lineal. Aunque ahora algunas
+# de las caracteristicas base como Household nos indica que habría que eliminarlas
+# por el p-value, se han de mantener por el principio de jerarquia.
+
+
+#
+# NO LINEALIDAD
+#
+
+# A partir del mejor modelo anterior (fit8), voy a probar a añadir terminos de no linealidad
+
+fit9 = lm(MedianHouseValue ~ . + TotalBedrooms * Households * MedianIncome + I(Population^2), data = California) 
+summary(fit9)
+
