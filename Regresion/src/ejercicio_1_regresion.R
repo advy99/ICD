@@ -7,6 +7,19 @@ require(MASS)
 
 
 # Leemos los datos
+
+# IMPORTANTE: por la forma en la que creo los proyectos los datos están en la carpeta
+# data, mis proyectos siguien esta estructura:
+###
+#  nombre_proyecto.Rproj
+#  src/ # carpeta con el codigo
+#   |
+#   |- ejercicio_1_regresion.R
+#   |- ejercicio_2_regresion.R
+#  data/
+#   |
+#   |- Todos los ficheros de california, etc
+
 California <- read.csv("data/california.dat", comment.char = "@", header = FALSE)
 
 # Le asignamos los nombres
