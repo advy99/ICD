@@ -226,6 +226,23 @@ summary(fit8)
 
 # A partir del mejor modelo anterior (fit8), voy a probar a añadir terminos de no linealidad
 
-fit9 = lm(MedianHouseValue ~ . + TotalBedrooms * Households * MedianIncome + I(Population^2), data = California) 
+# para graficar los valores de x al cuadrado con respecto a Y
+temp <- California
+temp_cuadrado <- California^2
+plotY_cuadrado <- function (x,y) {
+	plot(temp[,y]~temp_cuadrado[,x], xlab=paste(names(temp)[x]," X",x,sep=""), ylab=names(temp)[y])
+}
+
+# vamos a ver las caracteristicas al cuadrado con respecto a MedianHouseValue
+par(mfrow=c(3,3)) #Si margin too large => (2,3)
+x <- sapply(1:(dim(temp)[2]-1), plotY_cuadrado, dim(temp)[2])
+par(mfrow=c(1,1))
+
+# como vemos no cambian de forma y esta transformación no nos aporta mucha información
+# así que vamos a probar con algunas de las variables que mejor se ven,
+# como el MedianIncome.
+fit9 = lm(MedianHouseValue ~ . + TotalBedrooms * Households * MedianIncome + I(MedianIncome^2), data = California) 
 summary(fit9)
 
+# con esta prueba hemos mejorado el R-squared en menos de un 1%, aunque el
+# p-value si nos indica que el termino no lineal si es significativo
