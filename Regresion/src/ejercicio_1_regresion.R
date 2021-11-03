@@ -1,9 +1,10 @@
+#install.packages("ISLR")
+#install.packages("MASS")
+
 
 require(ISLR)
 require(MASS)
 
-#install.packages("ISLR")
-#install.packages("MASS")
 
 # Leemos los datos
 California <- read.csv("data/california.dat", comment.char = "@", header = FALSE)
@@ -246,3 +247,6 @@ summary(fit9)
 
 # con esta prueba hemos mejorado el R-squared en menos de un 1%, aunque el
 # p-value si nos indica que el termino no lineal si es significativo
+
+sqrt(sum(fit9$residuals^2)/length(fit9$residuals)) #MSE
+# como vemos con el MSE, hemos mejorado de 83733.57 a 68692.05
