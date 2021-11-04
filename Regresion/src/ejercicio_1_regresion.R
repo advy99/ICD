@@ -1,3 +1,5 @@
+# Autor: Antonio David Villegas Yeguas
+
 #install.packages("ISLR")
 #install.packages("MASS")
 
