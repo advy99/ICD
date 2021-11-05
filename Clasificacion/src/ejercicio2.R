@@ -18,3 +18,4 @@ glm_fit <- train(wbcd %>% select(-c(diagnosis)), y = wbcd[, "diagnosis"], method
 				control=glm.control(maxit=500), trControl = trainControl(method = "cv"))
 
 glm_fit
+
