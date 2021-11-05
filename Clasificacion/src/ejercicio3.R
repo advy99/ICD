@@ -102,6 +102,13 @@ mean(qda.pred$class==Smarket.2005$Direction)
 
 # ahora vamos a comprar el resultado de las tras con una gráfica
 
+# vamos a comparar las acuraccy de los tres métodos con un gráfico de 
+# barras utilizando ggplot
+
+# Al utilizar más de tres predictores no podemos comparar los resultados
+# obtenidos por PCA y QDA, si hubieramos utilizado solo dos o tres podríamos
+# hacer un gráfico 2D o 3D mostrando las fronteras obtenidas por los métodos
+
 
 
 
