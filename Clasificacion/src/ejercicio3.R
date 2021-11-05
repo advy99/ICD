@@ -83,6 +83,25 @@ glmFit
 
 # QDA
 
+# ya hemos hecho todos los test de normalidad y demás
+
+qda.fit <- qda(Direction~Lag1+Lag2+Lag3+Lag4+Lag5, data=Smarket, subset=Year<2005)
+qda.fit
+
+qda.pred <- predict(qda.fit, Smarket.2005)
+
+data.frame(qda.pred)[1:5,]
+
+table(qda.pred$class,Smarket.2005$Direction)
+mean(qda.pred$class==Smarket.2005$Direction)
+
+# con qda seguimos manteniendo resultados, es más, empeoramos
+# un poco los que obteniamos usando solo el Lag1 y el Lag2
+
+# comparativa de LDA, QDA y Regresion Logistica
+
+# ahora vamos a comprar el resultado de las tras con una gráfica
+
 
 
 
