@@ -3,6 +3,9 @@ library(ISLR)
 library(tidyverse)
 library(ggplot2)
 
+# para los experimentos
+set.seed(2)
+
 str(Smarket)
 up <- Smarket %>% filter(Direction == "Up")
 down <- Smarket %>% filter(Direction == "Down")
@@ -68,12 +71,17 @@ accuracy_lda
 # con regresion logistica, entre 0.52 y 0.55 de precision
 library(caret)
 
+Smarket_train <- Smarket %>% filter(Year < 2005)
+Smarket_test <- Smarket %>% filter(Year == 2005)
+
 # AVISO: MASS ha pisado el select de dplyr ...
-glmFit <- train(Smarket %>% dplyr::select(-c(Direction, Today)), y = Smarket[, "Direction"], method = "glm", 
-				preProcess = c("center", "scale"), tuneLength = 10, 
-				control=glm.control(maxit=500), trControl = trainControl(method = "cv"))
+glmFit <- train(Smarket_train %>% dplyr::select(-c(Direction, Today)), y = Smarket_train[, "Direction"] , method = "glm")
 glmFit
-accuracy_rl <- glmFit$results$Accuracy
+glm.pred <- predict(glmFit, Smarket.2005)
+data.frame(glm.pred)[1:5,]
+glm.pred
+
+accuracy_rl <- mean(glm.pred==Smarket.2005$Direction)
 accuracy_rl
 
 # ambos modelos intentan poner lineas en unos datos que no
@@ -123,16 +131,23 @@ ggplot(data = datos_comparativa, aes(x = name, y = value, fill = name)) +
 
 
 # Como vemos en la gráfica, ninguno de los tres métodos obtiene
-# un buen resultado, estando todos entre un 0.5 y un 0.6 de accuracy. Esto
+# un buen resultado, estando todos entre un 0.55 y un 0.6 de accuracy. Esto
 # se debe a que, como hemos visto en el analisis de los datos, son que
 # no están separados de ninguna forma e intentar predecirlos sería como
 # tirar una moneda al aire.
 
 # Por otro lado vemos como el modelo que mejor se ha comportado es LDA
-# seguido muy de cerca de QDA. Esto puede deberse simplmente a que el ajuste
+# seguido muy de cerca de QDA y RL. Esto puede deberse simplemente a que el ajuste
 # de LDA ha tenido suerte y con el conjunto de datos de entrenamiento (Year < 2005)
 # ya que como hemos comentado, con estos datos nunca podremos hacer una buena
 # prediccion
+
+# Tanto LDA como RL intentan separar los datos linealmente, sin embargo esperabamos
+# que RL obtuviera un mejor resultado que LDA ya que LDA necesita que los predictores
+# sigan una distribución normal. Como vimos al principio del ejercicio, esto no 
+# ocurria con los predictores escogidos, sin embargo si es cierto que el único
+# problema estaba en las colas y tal vez LDA si ha sido capaz de ajustarse bien
+# aun manteniendo ese error
 
 
 
