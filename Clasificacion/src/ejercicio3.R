@@ -60,7 +60,8 @@ lda.pred <- predict(lda.fit, Smarket.2005)
 data.frame(lda.pred)[1:5,]
 
 table(lda.pred$class,Smarket.2005$Direction)
-mean(lda.pred$class==Smarket.2005$Direction)
+accuracy_lda <- mean(lda.pred$class==Smarket.2005$Direction)
+accuracy_lda
 
 # hemos conseguido subir de una precision del 0.55 a una del 0.58
 
@@ -72,7 +73,8 @@ glmFit <- train(Smarket %>% dplyr::select(-c(Direction, Today)), y = Smarket[, "
 				preProcess = c("center", "scale"), tuneLength = 10, 
 				control=glm.control(maxit=500), trControl = trainControl(method = "cv"))
 glmFit
-
+accuracy_rl <- glmFit$results$Accuracy
+accuracy_rl
 
 # ambos modelos intentan poner lineas en unos datos que no
 # son para nada separables, LDA al menos cambia los ejes con combinaciones lineales
@@ -93,7 +95,8 @@ qda.pred <- predict(qda.fit, Smarket.2005)
 data.frame(qda.pred)[1:5,]
 
 table(qda.pred$class,Smarket.2005$Direction)
-mean(qda.pred$class==Smarket.2005$Direction)
+accuracy_qda <- mean(qda.pred$class==Smarket.2005$Direction)
+accuracy_qda
 
 # con qda seguimos manteniendo resultados, es más, empeoramos
 # un poco los que obteniamos usando solo el Lag1 y el Lag2
@@ -109,6 +112,27 @@ mean(qda.pred$class==Smarket.2005$Direction)
 # obtenidos por PCA y QDA, si hubieramos utilizado solo dos o tres podríamos
 # hacer un gráfico 2D o 3D mostrando las fronteras obtenidas por los métodos
 
+datos_comparativa <- data.frame(accuracy_rl, accuracy_lda, accuracy_qda)
+datos_comparativa <- datos_comparativa %>% pivot_longer(c(1:3))
+datos_comparativa
+
+
+ggplot(data = datos_comparativa, aes(x = name, y = value, fill = name)) +
+	geom_bar(stat = "identity") + 
+	scale_y_continuous(breaks = seq(0, 0.6, 0.05))
+
+
+# Como vemos en la gráfica, ninguno de los tres métodos obtiene
+# un buen resultado, estando todos entre un 0.5 y un 0.6 de accuracy. Esto
+# se debe a que, como hemos visto en el analisis de los datos, son que
+# no están separados de ninguna forma e intentar predecirlos sería como
+# tirar una moneda al aire.
+
+# Por otro lado vemos como el modelo que mejor se ha comportado es LDA
+# seguido muy de cerca de QDA. Esto puede deberse simplmente a que el ajuste
+# de LDA ha tenido suerte y con el conjunto de datos de entrenamiento (Year < 2005)
+# ya que como hemos comentado, con estos datos nunca podremos hacer una buena
+# prediccion
 
 
 
