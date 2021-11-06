@@ -1,5 +1,18 @@
 library(readr)
 
+
+# IMPORTANTE: por la forma en la que creo los proyectos los datos están en la carpeta
+# data, mis proyectos siguien esta estructura:
+###
+#  nombre_proyecto.Rproj
+#  src/ # carpeta con el codigo
+#   |
+#   |- ejercicio1.R
+#   |- ejercicio2.R
+#   |- ...
+#  data/
+#   |
+#   |- clasif_train_alumnos.csv
 clasif_train_alumnos <- read_csv("data/clasif_train_alumnos.csv")
 
 clasif_train_alumnos
