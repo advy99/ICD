@@ -72,7 +72,6 @@ accuracy_lda
 library(caret)
 
 Smarket_train <- Smarket %>% filter(Year < 2005)
-Smarket_test <- Smarket %>% filter(Year == 2005)
 
 # AVISO: MASS ha pisado el select de dplyr ...
 glmFit <- train(Smarket_train %>% dplyr::select(-c(Direction, Today)), y = Smarket_train[, "Direction"] , method = "glm")
