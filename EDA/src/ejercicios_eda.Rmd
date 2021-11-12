@@ -1,0 +1,184 @@
+---
+title: "Ejercicios EDA"
+author: "Antonio David Villegas Yeguas"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Exploratory Data Analysis
+
+## Ejemplo 1, hip dataset
+
+### Descargate el  dataset hip con el siguiente commando
+
+```{r}
+# no me funcionaba la URL, así que lo leo en local
+hip  <-read.table("../data/HIP_star.dat", header=T,fill=T)
+```
+
+
+### Una vez descargado comprueba la dimensión y los nombres de las columnas del dataset. ¿Qué dimensión tiene? ¿qué tipo de datos alberga? (e.g. 4 variables numéricas continuas)
+
+Con `dim` podemos ver que cuenta con 2719 filas y con 9 características. De dichas características, con `summary` y `head` podemos ver que se tratan todas de características numéricas, siendo la primera de estas de tipo entero y el resto reales. Otro detalle que podemos ver con `summary` es que la última columna cuenta con 41 valores perdidos.
+
+```{r}
+dim(hip)
+head(hip)
+summary(hip)
+```
+
+### Calcula las tendencias centrales de todos los datos del dataset (mean, media)
+
+Aunque ya las hemos observado antes con `summary`, vamos a calcularlas de forma manual
+
+```{r}
+medias <- apply(hip, 2, mean)
+medianas <- apply(hip, 2, median)
+
+medias
+medianas
+summary(hip)
+```
+
+
+Vemos que el resultado coincide con el resultado del `summary`.
+
+
+### Haz lo mismo para las medidas de dispersión mínimo y máximo. ¿Seria posible hacerlo con un único comando?¿Que hace la función range()?
+
+Podemos utilizar la función `range`, la cual nos devuelve el mínimo y el máximo de los argumentos dados.
+
+```{r}
+minimo_y_maximo <- apply(hip, 2, range)
+row.names(minimo_y_maximo) <- c("minimo", "maximo")
+minimo_y_maximo
+```
+
+### Sin embargo las medidas mas populares de dispersión son la varianza (var()), su desviación standard (sd()) y la desviación absoluta de la mediana mad(). Calcula estas medidas para los valores de la variable RA
+
+```{r}
+varianza_RA <- var(hip$RA)
+desviacion_estandar_RA <- sd(hip$RA)
+desviacion_absoluta_mediana_RA <- mad(hip$RA)
+
+varianza_RA
+desviacion_estandar_RA
+desviacion_absoluta_mediana_RA
+```
+
+
+### Imagina que quieres calcular dos de estos valores de una sola vez. ¿Te serviría este código?
+
+Si, serviría, ya que simplemente llamamos a las dos funciones exactamente igual que lo haciamos antes, solo que encapsuladas en una función.
+
+```{r}
+f = function(x) c(median(x), mad(x))  
+f(hip[,3])
+```
+
+
+### Implementa estos cálculos para RA usando dplyr de tidyverse
+
+```{r}
+library(tidyverse)
+
+varianza_RA <- hip$RA %>% var()
+desviacion_estandar_RA <- hip$RA %>% sd()
+desviacion_absoluta_mediana_RA <- hip$RA %>%  mad()
+
+varianza_RA
+desviacion_estandar_RA
+desviacion_absoluta_mediana_RA
+
+```
+
+### ¿Cuál sería el resultado de aplicar apply(hip,2,f)?
+
+Nos devolverá la mediana y la desviacion media absoluta para cada columna. Debido a que la ultima columna tiene valores perdidos, nos devuelve NA para dicha columna.
+
+```{r}
+apply(hip, 2, f)
+```
+
+
+### Vamos a medir la dispersión de la muestra utilizando el concepto de cuartiles. El percentil 90 es aquel dato que excede en un 10% a todos los demás datos. El cuartil (quantile) es el mismo concento, solo que habla de proporciones en vez de porcentajes. De forma que el percentil 90 es lo mismo que el cuartil 0.90. La mediana “median” de un dataset es el valor más central, en otras palabras exactamente la mitad del dataset excede la media. Calcula el cuartil .10 y .50 para la columna RA del dataset hip. Sugerencia: quantile()
+
+```{r}
+quantile(hip$RA, probs = c(0.1, 0.5))
+```
+
+### Los cuantiles 0.25 y 0.75 se conocen como el  “first quartile” o Q1 y el “third quartile” o Q3, respectivamente. Calcula los cuatro cuartiles para RA con un único comando.
+
+```{r}
+# es el probs por defecto, pero quería marcar que vamos a usar ese
+quantile(hip$RA, probs = seq(0, 1, 0.25))
+```
+
+
+### Otra medida de dispersion es la diferencia entre el primer y el tercer cuartil conocida como rango intercuartil (IQR) Inter Quantile Range. ¿Obtienes ese valor con la función summary()?
+
+No directamente, pero se podría calcular ya que obtenemos el valor del primer y tercer cuartil. Para calcularla podemos utilizar la función IQR.
+
+
+### Hasta ahora has ignorado la presencia de  valores perdidos NA. La función any() devuelve TRUE si se encuentra al menos un TRUE en el vector que damos como argumento. Su combinación con is.na es muy útil. ¿qué obtienes cuando ejecutas el siguiente comando? ¿Cómo lo interpretas?
+
+```{r}
+hasNA = function(x) any(is.na(x)) 
+apply(hip,2,hasNA)
+```
+
+Obtenemos que la última columna, B.V, tiene valores perdidos, como habíamos visto al principio con `summary`, y es que como hemos visto, ya ha afectado a algunos de los cálculos. 
+
+Buscando un poco más de información sobre el dataset (https://astrostatistics.psu.edu/datasets/HIP_star.html) podemos ver como esta característica corresponde al color de la estrella, en una escala de luminosidad.
+
+Si intentamos realizar alguna operación con dicha columna obtendremos como resultado NA, ya que por defecto se tiene en cuenta los valores perdidos. Para evitar esto tenemos que añadir el parametro `na.rm = TRUE`.
+
+```{r}
+min(hip$B.V)
+min(hip$B.V, na.rm = TRUE)
+```
+
+
+### hip1 = na.omit(hip) Como has observado  nos devuelve NA para toda la columna,  normalmente querríamos poder usar la función sobre el resto de datos que no son NA: Para ello podemos utilizar la función na.omit. ¿Que ocurre cuando lo hacemos?. Usando apply calcula la media para hip. Intenta calcular la media de forma que solo cambie la de B.V cuando ignores los valores NA.
+
+```{r}
+hip1 <- na.omit(hip)
+hip1
+
+
+apply(hip1, 2, mean)
+summary(hip)
+```
+
+Como vemos, al haber eliminado filas completas se modifican los valores originales, ya que ha eliminado la fila completa del dataset, no solo está evitando usar esos valores en B.V.
+
+Para hacer que solo se cambie la de B.V podemos añadir el parametro de `na.rm` al calcular la media.
+
+```{r}
+apply(hip, 2, mean, na.rm = TRUE)
+summary(hip)
+```
+
+Como vemos ya si coinciden todas con las del `summary`.
+
+
+### Obten una idea aproximada de tus datos mediante la creación de un boxplot del hip dataset
+
+```{r}
+boxplot(hip)
+```
+
+Podemos ver como los datos no están normalizados, y debido a la variable HIP las demás características son simplemente una linea, vamos a probar a graficarlo sin HIP.
+
+```{r}
+boxplot(hip[-1])
+```
+
+Sigue ocurriendo lo mismo, aunque en este caso podemos ver como en este caso si que podemos observar otras características como pmDE o pmRA las cuales cuentan con outliers.
+
+
+### Crea un scatterplot que te compare los valores de RA y DE. Representa los puntos con el símbolo ‘.’ Y que estos puntos sean de color rojo si DE excede de 0.
