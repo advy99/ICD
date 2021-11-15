@@ -182,3 +182,147 @@ Sigue ocurriendo lo mismo, aunque en este caso podemos ver como en este caso si 
 
 
 ### Crea un scatterplot que te compare los valores de RA y DE. Representa los puntos con el símbolo ‘.’ Y que estos puntos sean de color rojo si DE excede de 0.
+
+```{r}
+library(ggplot2)
+
+hip_scatter_DE_negativo <- hip %>% filter(hip$DE < 0)
+hip_scatter_DE_positivo <- hip %>% filter(hip$DE >= 0)
+
+
+ggplot(data = hip_scatter_DE_negativo, aes(x = RA)) +
+	geom_point(aes(y = DE), colour = "red") +
+	geom_point(data = hip_scatter_DE_positivo, aes(x = RA, y = DE))
+
+```
+
+
+### Haz un scatterplot de RA y pmRA. ¿Ves algún patrón?
+
+```{r}
+ggplot(data = hip, aes(x = RA, y = pmRA)) +
+	geom_point()
+```
+
+Si, vemos como existe una gran correlación entre ambas variables. Se ve claramente como en el rango [0, 180] cuando RA crece, pmRA decrece, y al pasar el valor de RA de 180, pmRA vuelve a crecer conforme crece RA.
+
+### En vez de crear los plots por separado para cada par de columnas, hazlos con un solo comando con el scatterplot matrix
+
+
+```{r}
+pairs(hip)
+```
+
+### Para poder acceder a las variables por su nombre usa attach(hip).Vamos a seleccionar las estrellas Hyadas del dataset aplicando los siguientes filtros:
+
+```{r}
+attach(hip)
+```
+
+
+
+### Crea un nuevo dataset con la aplicación de estos filtro. El Nuevo dataset se llama hyades. ¿Que dimensiones tiene? Grafica un scatterplot de Vmag vs B.V
+
+```{r}
+hyades <- hip %>% filter(RA > 50 & RA < 100 &
+						 DE > 0 & DE < 25 &
+						 pmRA > 90 & pmRA < 130 &
+						 pmDE > -60 & pmDE < -10 &
+						 e_Plx < 5 &
+						 (Vmag > 4 | B.V < 0.2))
+
+dim(hyades)
+```
+
+Como vemos, tiene información de 88 estrellas.
+
+```{r}
+ggplot(data = hyades, aes(x = Vmag, y = B.V)) +
+	geom_point()
+
+```
+
+
+Como vemos en el gráfico, existe una clara dependencia lineal entre B.V y Vmag
+
+## Ejemplo 2, InsectSprays dataset
+
+### El dataset “InsectSprays” está incluido en la libreria de R “datasets”. Contiene el conteo de insectos extraidos de diferentes zonas agrícolas tratadas de forma experimental con diferentes insecticidas. Haz un boxplot para determiner que insecticida parece ser el más efectivo.
+
+```{r}
+ggplot(InsectSprays, aes(x = spray, y = count)) +
+	geom_boxplot() + 
+	scale_y_continuous(breaks = seq(0, 25, 5))
+```
+
+Como podemos ver el mejor insecticida es el C, ya que tras aplicarlo es con el que menos insectos se extraen en comparación con los otros insecticidas.
+
+
+
+## Ejemplo 3, Carseats
+
+### Instala la library(ISLR), vamos a trabajar con el dataset Carseats. Si vas a usar dplyr puedes inspeccionar el paquete “dlookr”
+
+```{r}
+library(ISLR)
+library(moments)
+
+# miramos los datos
+summary(Carseats)
+
+# miramos el skewness solo si la variable es numérica
+carseats_skewness <- sapply(Carseats %>% select_if(is.numeric), skewness)
+```
+
+Como vemos, Sales y Advertising tienen sus datos escorados a la derecha, mientras que Price los tiene escorados a la izquierda. El resto de variables, aunque presentan cierto escoramiento, se encuentran cerca del 0, lo que indican que se asemejan a una distribución normal.
+
+### Genera dos listas, una de variables con skewness a la derecha y otra con skewness a la izquierda
+
+```{r}
+carseats_skewness_derecha <- as.data.frame(carseats_skewness) %>% filter(carseats_skewness > 0)
+carseats_skewness_izquierda <- as.data.frame(carseats_skewness) %>% filter(carseats_skewness < 0)
+
+carseats_skewness_derecha
+carseats_skewness_izquierda
+```
+
+
+### Averigua que variables no están distribuidas de forma normal, crea gráficos que lo prueben
+
+
+```{r}
+mostrar_grafico_qq <- function(x) {
+	qqnorm(x)
+	qqline(x)
+}
+
+sapply(Carseats %>% select_if(is.numeric), mostrar_grafico_qq)
+
+```
+
+Gráficamente utilizando `qqnorm` y `qqline` podemos ver que solo CompPrice y Price parecen seguir una distribución normal, aunque para asegurarnos utilizaremos el test de Shapiro-Wilk
+
+
+```{r}
+# para recordar como se usa el test, si el p-value es bajo,
+# rechazamos hipotesis de que sigue una normal
+shapiro.test(rnorm(1000))
+shapiro.test(runif(1000))
+
+sapply(Carseats %>% select_if(is.numeric), shapiro.test)
+```
+Como podemos ver tras aplicar el test, no podemos rechazar que siga una distribución normal para las características Sales, CompPrice y Price.
+
+
+
+### Encuentra que variables están correlaccionadas positiva y cuales negativamente.
+
+Para esto utilizaremos la función `cor` para obtener la matriz de correlación, además de utilizar el gráfico `pairs` para graficar todas las variables entre si.
+
+```{r}
+# nos quedamos solo con las numericas
+cor(Carseats %>% select_if(is.numeric))
+
+pairs(Carseats %>% select_if(is.numeric))
+```
+
