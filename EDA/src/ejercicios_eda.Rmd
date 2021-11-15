@@ -317,12 +317,73 @@ Como podemos ver tras aplicar el test, no podemos rechazar que siga una distribu
 
 ### Encuentra que variables están correlaccionadas positiva y cuales negativamente.
 
-Para esto utilizaremos la función `cor` para obtener la matriz de correlación, además de utilizar el gráfico `pairs` para graficar todas las variables entre si.
+Para esto utilizaremos la función `cor` para obtener la matriz de correlación, además de utilizar el gráfico `corrplot` para graficar todas las variables entre si.
 
 ```{r}
 # nos quedamos solo con las numericas
-cor(Carseats %>% select_if(is.numeric))
+matriz_cor <- cor(Carseats %>% select_if(is.numeric))
 
-pairs(Carseats %>% select_if(is.numeric))
+library(corrplot)
+corrplot(matriz_cor)
 ```
 
+## Ejemplo 4, iris dataset
+
+
+### Inspecciona las primeras filas del dataset y calcula el summary() del mismo con cada atributo del dataset
+
+```{r}
+head(iris)
+summary(iris)
+```
+
+### Crea un histograma de petal.width , teniendo en cuenta que el numero de bins es variable fija este a 9. Añádele color y nombres al eje x "Petal Width"y al gráfico dale el nombre de  "Histogram of Petal Width". Crea un histograma para cada variable
+
+
+```{r}
+ggplot(iris, aes(x = Petal.Width)) +
+	geom_histogram(bins = 9) +
+	ggtitle("Histogram of Petal Width") +
+	xlab("Petal Width")
+```
+
+Ahora vamos a hacer gráficas para todas las variables. Eliminamos la característica a predecir, y aplicamos un gather, para ponerlo todo en formato largo. Tras esto aplicamos un histograma en el que hacemos un facet_wrap por clave, para que genere cuatro histogramas, uno para cada característica.
+
+```{r}
+ggplot(iris[-5] %>% gather(), aes(x = value)) +
+	geom_histogram(bins = 9) +
+	ggtitle("Histogram of Iris") +
+	facet_wrap(~key)
+```
+
+
+### Crea los cuartiles del dataset
+
+```{r}
+cuartiles <- sapply(iris[-5], quantile)
+cuartiles
+```
+
+
+### Representa en un boxplot la variable de ancho de hoja dependiendo del tipo de hoja que tengan
+
+```{r}
+ggplot(iris, aes(x = Petal.Width, y = Species)) +
+	geom_boxplot()
+```
+
+
+
+### Crea los boxplot de la longitud del pétalo en función de la especie de Iris
+
+```{r}
+ggplot(iris, aes(x = Petal.Length, y = Species)) +
+	geom_boxplot()
+```
+
+### Crea una nueva columna llamada proporción que es el ratio entre Sepal.Length y Sepal.Width
+
+```{r}
+nuevo_iris <- iris %>% mutate(proporcion = Sepal.Length/Sepal.Width)
+nuevo_iris
+```
