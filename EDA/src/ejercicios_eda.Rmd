@@ -387,3 +387,64 @@ ggplot(iris, aes(x = Petal.Length, y = Species)) +
 nuevo_iris <- iris %>% mutate(proporcion = Sepal.Length/Sepal.Width)
 nuevo_iris
 ```
+
+
+## Ejemplo 5, swiss dataset
+
+### El conjunto de datos “swiss” contiene una medida estandarizada de fecundidad y varios indicadores socioeconómicos para cada una de las 47 provincias francófonas de Suiza.
+
+```{r}
+summary(swiss)
+```
+
+#### ¿Qué diagrama dibujaría para mostrar la distribución de todos los valores? ¿Qué conclusiones sacarías? 
+
+Utilizaría un histograma, con el que podría ver que tipo de distribución siguen los datos y si están escorados.
+
+
+### Dibuje gráficos para cada variable. ¿Qué puede concluir de las distribuciones con respecto a su forma y posibles valores atípicos?
+
+```{r}
+# CUIDADO: ESCALA EN X LIBRE
+# para que se vea mejor cada gráfico he puesto la escala en X libre,
+# no comparar las gráficas entre ellas, mirar individualmente el eje X
+ggplot(swiss %>% gather(), aes(x = value)) +
+	geom_histogram(bins = 20) +
+	facet_wrap(~key, scales = "free_x")
+```
+
+
+Podemos ver que en la variable Education podemos tener un valor atípico con valor 53, además de en la mortalidad infantil un valor de 11. Con respecto a la forma de las distribuciones podemos ver como la educación y la mortalidad infantil siguen una distribución que se asemeja a la normal, mientras que Fertility, Examination y Agriculture aunque se asemejan a una normal tienen una kurtosis negativa, ya que están más aplastadas. Por último, con respecto a característica Catholic podemos ver como puede ser una bimodal, que sigue una normal por la izquierda y otra por la derecha. 
+
+
+#### Dibuja un diagrama de dispersión de Fertilidad frente a % Catholic. ¿Qué tipo de áreas tienen las tasas de fertilidad más bajas?
+
+```{r}
+ggplot(swiss, aes(x = Fertility, y = Catholic)) +
+	geom_point()
+```
+
+En este gráfico podemos distinguir tres zonas claras. Una zona con un alto porcentaje de personas católicas, que también tienen un alto porcentaje de fertilidad, otra con un porcentaje muy bajo de personas católicas y con un porcentaje de fertilidad medio-alto, y por último, aunque minoritario, un grupo de zonas con la fertilidad más baja en la que el porcentaje de personas católicas es sobre el 50%.
+
+#### ¿Qué tipo de relación existe entre las variables Educación y Agricultura?
+
+```{r}
+ggplot(swiss, aes(x = Education, y = Agriculture)) +
+	geom_point()
+```
+
+Como podemos ver en el gráfico, a un mayor nivel de educación, menor es el nivel de agricultura de esa zona.
+
+
+## Ejemplo 6, HSAUR2 dataset
+
+### El conjunto de datos se llama Lanza del paquete HSAUR2.
+
+```{r}
+library(HSAUR2)
+```
+
+
+
+
+
