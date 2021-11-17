@@ -444,7 +444,86 @@ Como podemos ver en el gráfico, a un mayor nivel de educación, menor es el niv
 library(HSAUR2)
 ```
 
+#### Se informan los datos de cuatro estudios. Dibuje un diagrama para mostrar si los cuatro estudios son igualmente grandes.
+
+```{r}
+summary(Lanza)
+
+ggplot(Lanza, aes(x = study)) +
+	geom_bar()
+```
+
+Como vemos, los estudios I, II y III si son igual de grandes, pero el estudio IV es mucho más pequeño.
 
 
+#### El resultado se mide por la clasificación de la variable con puntuaciones de 1 (mejor) a 5 (peor). ¿Cómo describirías la distribución?
 
+Vamos a observar la distribución con un gráfico de barras para cada puntuación.
+
+```{r}
+ggplot(Lanza, aes(x = classification)) +
+	geom_bar()
+```
+
+
+Claramente no sigue una distribución normal visualmente, pero aún así vamos a lanzar el test de Shapiro-Wilk para comprobarlo
+
+```{r}
+shapiro.test(as.numeric(Lanza$classification))
+```
+
+
+Con este resultado podemos rechazar la hipotesis nula de que los datos siguen una distribución normal.
+
+###  El paquete vcdExtra incluye datos de un viejo estudio de cáncer de mama sobre la supervivencia o muerte de 474 pacientes.
+
+```{r}
+library("vcdExtra")
+Cancer
+```
+
+#### Convierta los datos en un data frame y dibuje gráficos para comparar las tasas de supervivencia, primero, por grado de malignidad y, en segundo lugar, por centro de diagnóstico.
+
+```{r}
+Cancer_df <- as.data.frame(Cancer)
+Cancer_df
+
+ggplot(Cancer_df, aes(x = Survival, y = Cancer_df$Freq)) +
+	geom_boxplot()
+
+# utilizando un summary en lugar de mutate no repito datos y queda la tabla
+# mas limpia, pero por algun motivo Kinitr no le gusta para generar el PDF
+agrupado <- Cancer_df %>% group_by(Center, Survival) %>% 
+				mutate(NumeroPacientes = sum(Freq))
+agrupado
+ggplot(agrupado, aes(x = Center, y = NumeroPacientes, fill = Survival)) +
+	geom_bar(stat = "identity", position = "dodge")
+
+```
+
+
+###  Dataset Crabs (del paquete MASS) [Venables y Ripley, 2002]. Los autores inicialmente se transforman a una escala logarítmica y luego escriben que: “The data are very highly correlated and scatterplot matrices and brush plots [i.e. interactive graphics] are none too revealing.”
+
+
+#### Utilizando gráficos generales, comente si la transformación logaritmica fue una buena idea y si está de acuerdo con su afirmación sobre las correlaciones.
+
+```{r}
+library(MASS)
+
+summary(crabs)
+
+# vistazo general con ggpairs
+library(GGally)
+ggpairs(crabs)
+
+```
+
+Podemos ver rapidamente, que efectivamente tenian razón con las correlaciones, todas las características parece que están correladas entre si. Para ver esto mejor vamos a mostrar una matriz de correlación.
+
+```{r}
+library(ggcorrplot)
+ggcorrplot(cor(crabs %>% select_if(is.numeric)))
+```
+
+Efectivamente, todas las características numéricas están correlacionadas de forma positiva.
 
