@@ -1,6 +1,6 @@
 library(tidyverse)
 library(readr)
-
+library(Amelia)
 
 #
 # Clasificación
@@ -28,5 +28,10 @@ str(iris)
 iris$Class <- as.factor(iris$Class)
 summary(iris)
 
+
+# miramos si tenemos valores perdidos
+missmap(iris)
+
+any(is.na(iris))
 
 
