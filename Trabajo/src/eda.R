@@ -1,6 +1,9 @@
 library(tidyverse)
 library(readr)
 library(Amelia)
+library(ggplot2)
+library(corrplot)
+library(GGally)
 
 #
 # Clasificación
@@ -35,3 +38,32 @@ missmap(iris)
 any(is.na(iris))
 
 
+# calculamos medidas de interes
+
+medias_iris <- apply(iris[,-5], 2, mean)
+medias_iris
+
+sd_iris <- apply(iris[, -5], 2, sd)
+sd_iris
+
+minimos_iris <- apply(iris[,-5], 2, min)
+minimos_iris
+
+maximos_iris <- apply(iris[,-5], 2, max)
+maximos_iris
+
+
+
+# graficamos los datos
+
+mostrar_grafico_qq <- function(x) {
+	qqnorm(x)
+	qqline(x)
+}
+
+par(mfrow=c(2,2))
+apply(iris[,-5], 2, mostrar_grafico_qq)
+par(mfrow=c(1,1))
+
+# vistazo general
+ggpairs(iris, aes(colour = Class)) + theme_minimal()
