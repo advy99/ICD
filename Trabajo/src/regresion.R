@@ -14,6 +14,10 @@ calcular_RMSE <- function(valores_reales, valores_predecidos) {
 	sqrt(sum((valores_predecidos - valores_reales)^2)/(length(valores_reales)-2))
 }
 
+# creamos si es necesario los directorios a usar de salida
+directorios_necesarios <- list("out", "out/baseball", "out/baseball/ajuste_lm")
+
+lapply(directorios_necesarios, function(directorio) {if (!dir.exists(directorio)) dir.create(directorio) })
 
 
 # leemos los datos
@@ -63,3 +67,20 @@ lapply(fit_lm_baseball, function (fit) {
 	nombre_predictor <- fit$terms[[3]]
 	calcular_RMSE(baseball$Salary, predict(fit, baseball$nombre_predictor))
 })
+
+
+# guardamos en disco un grafico con el ajuste obtenido
+lapply(fit_lm_baseball, function (fit) {
+	nombre_predictor <- fit$terms[[3]]
+	svg(paste("out/baseball/ajuste_lm/ajuste_lm_", nombre_predictor, ".svg", sep = ""))
+	plot(as.formula(paste("Salary ~", nombre_predictor) ), baseball)
+	abline(fit, col="blue")
+	dev.off()
+	par(mfrow=c(1,1))
+})
+
+
+
+
+
+
