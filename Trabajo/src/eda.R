@@ -225,7 +225,7 @@ medidas_baseball
 
 # vistazo general
 ggpairs(baseball, lower = list(combo = wrap("facethist", bins = 30))) + theme_minimal()
-ggsave("out/baseball/vista_general_baseball.svg", device = svg, device = svg, width = 1920, height = 1080, units = "px", dpi = 100)
+ggsave("out/baseball/vista_general_baseball.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 100)
 
 #
 ## CUIDADO!!! LAS ESCALAS ESTAN LIBRES PORQUE NO SE HAN ESCALADO LOS DATOS
