@@ -5,26 +5,58 @@ library(ggplot2)
 library(corrplot)
 library(GGally)
 
+
 #
 # Funciones
 #
 
-mostrar_grafico_densidad <- function(datos, nombre_variable) {
+mostrar_grafico_densidad <- function(datos, nombre_variable, save_plot = FALSE) {
 	ggplot(data = datos, aes_string(x = nombre_variable, fill = "Class")) +
 		geom_density(alpha = 0.5) + 
 		ggtitle(paste("Densidad de valores de ", nombre_variable, " por cada clase."))
+	
+	if (save_plot) {
+		ggsave(paste("out/iris/densidad_iris_", nombre_variable, ".svg", sep = ""), device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+	}
 }
 
-mostrar_boxplot <- function(datos, nombre_variable) {
+mostrar_boxplot <- function(datos, nombre_variable, save_plot = FALSE) {
 	ggplot(data = datos, aes_string(x = nombre_variable, fill = "Class")) +
 		geom_boxplot() + 
 		ggtitle(paste("Boxplot de ", nombre_variable, " por cada clase."))
+	
+	if (save_plot) {
+		ggsave(paste("out/iris/boxplot_iris_", nombre_variable, ".svg", sep = ""), device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+	}
+	
 }
 
-mostrar_grafico_qq <- function(datos, nombre) {
+mostrar_grafico_qq <- function(datos, nombre, save_plot = FALSE, directorio = "iris") {
+	
+	# para guardar la salida como svg, al no ser de ggplot
+	# tenemos que hacerlo así ...
+	if (save_plot) {
+		svg(paste("out/", directorio, "/qqplot_", directorio,"_" , nombre, ".svg", sep = ""))
+	}
+	
 	qqnorm(datos, main = paste("Normal Q-Q Plot: ", nombre))
 	qqline(datos)
+	
+	if (save_plot) {
+		dev.off()
+	}
 }
+
+
+#
+# Creación de directorios necesarios para la salida
+#
+
+directorios_necesarios <- list("out", "out/iris", "out/baseball")
+
+lapply(directorios_necesarios, function(directorio) {if (!dir.exists(directorio)) dir.create(directorio) })
+
+
 
 #
 # Clasificación
@@ -56,7 +88,11 @@ summary(iris)
 # y luego el qqplot no se verá bien, así que los restauramos despues del missmap
 par_default <- par(mar = c(0, 0, 0, 0))
 # miramos si tenemos valores perdidos
+# abrimos un dispositivo de salida en formato svg
+svg("out/iris/mismmap_iris.svg")
 missmap(iris)
+# lo cerramos al terminar de dibujar
+dev.off()
 par(par_default)
 
 any(is.na(iris))
@@ -81,20 +117,20 @@ medidas_iris
 # graficamos los datos
 
 # vistazo general
-ggpairs(iris, aes(colour = Class)) + theme_minimal()
+ggpairs(iris, aes(colour = Class),  lower = list(combo = wrap("facethist", bins = 20))) + theme_minimal()
+ggsave("out/iris/vista_general_iris.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
 
+mostrar_grafico_densidad(iris, "SepalLength", save_plot = TRUE)
+mostrar_grafico_densidad(iris, "SepalWidth", save_plot = TRUE)
+mostrar_grafico_densidad(iris, "PetalLength", save_plot = TRUE)
+mostrar_grafico_densidad(iris, "PetalWidth", save_plot = TRUE)
 
-mostrar_grafico_densidad(iris, "SepalLength")
-mostrar_grafico_densidad(iris, "SepalWidth")
-mostrar_grafico_densidad(iris, "PetalLength")
-mostrar_grafico_densidad(iris, "PetalWidth")
 
-
-mostrar_boxplot(iris, "SepalLength")
-mostrar_boxplot(iris, "SepalWidth")
-mostrar_boxplot(iris, "PetalLength")
-mostrar_boxplot(iris, "PetalWidth")
+mostrar_boxplot(iris, "SepalLength", save_plot = TRUE)
+mostrar_boxplot(iris, "SepalWidth", save_plot = TRUE)
+mostrar_boxplot(iris, "PetalLength", save_plot = TRUE)
+mostrar_boxplot(iris, "PetalWidth", save_plot = TRUE)
 
 
 ggplot(iris, aes(x = Class, fill = Class)) +
@@ -103,10 +139,11 @@ ggplot(iris, aes(x = Class, fill = Class)) +
 	xlab("Número de observaciones") +
 	ylab("Clases") +
 	ggtitle("Recuento de observaciones para cada clase")
+ggsave("out/iris/recuento_clases_iris.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
 
 par(mfrow=c(2,2))
-lapply(colnames(iris[,-5]), function(col_name) { mostrar_grafico_qq(iris[,col_name], col_name) } )
+lapply(colnames(iris[,-5]), function(col_name) { mostrar_grafico_qq(iris[,col_name], col_name, save_plot = TRUE) } )
 par(mfrow=c(1,1))
 
 # test de normalidad sobre las características
@@ -118,8 +155,9 @@ apply(iris[, -5], 2, shapiro.test)
 
 matriz_correlaciones_iris <- cor(iris[, -5])
 
+svg("out/iris/matriz_correlaciones_iris.svg")
 corrplot(matriz_correlaciones_iris, method = "ellipse")
-
+dev.off()
 
 
 
@@ -159,7 +197,9 @@ summary(baseball)
 # y luego el qqplot no se verá bien, así que los restauramos despues del missmap
 par_default <- par(mar = c(0, 0, 0, 0))
 # miramos si tenemos valores perdidos
+svg("out/baseball/mismmap_baseball.svg")
 missmap(baseball)
+dev.off()
 par(par_default)
 
 any(is.na(baseball))
@@ -184,7 +224,8 @@ medidas_baseball
 # graficamos los datos
 
 # vistazo general
-ggpairs(baseball) + theme_minimal()
+ggpairs(baseball, lower = list(combo = wrap("facethist", bins = 30))) + theme_minimal()
+ggsave("out/baseball/vista_general_baseball.svg", device = svg, device = svg, width = 1920, height = 1080, units = "px", dpi = 100)
 
 #
 ## CUIDADO!!! LAS ESCALAS ESTAN LIBRES PORQUE NO SE HAN ESCALADO LOS DATOS
@@ -195,18 +236,20 @@ ggplot(baseball %>% gather(), aes(x = value)) +
 	geom_boxplot() + 
 	coord_flip() +
 	facet_wrap(~key, scales = "free")
+ggsave("out/baseball/boxplot_baseball.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
 
 ggplot(baseball %>% gather, aes(x = value)) +
 	geom_density(alpha = 0.5, fill = "red") + 
 	facet_wrap(~key, scales = "free")
+ggsave("out/baseball/densidad_baseball.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
 
 
 # tenemos 17 variables, hacemos primero 9 y luego las 8 restantes
 par(mfrow=c(3,3))
-lapply(colnames(baseball[1:9]), function(col_name) { mostrar_grafico_qq(baseball[,col_name], col_name) } )
-lapply(colnames(baseball[10:17]), function(col_name) { mostrar_grafico_qq(baseball[,col_name], col_name) } )
+lapply(colnames(baseball[1:9]), function(col_name) { mostrar_grafico_qq(baseball[,col_name], col_name, save_plot = TRUE, directorio = "baseball") } )
+lapply(colnames(baseball[10:17]), function(col_name) { mostrar_grafico_qq(baseball[,col_name], col_name, save_plot = TRUE, directorio = "baseball") } )
 par(mfrow=c(1,1))
 
 
@@ -225,8 +268,9 @@ sigue_distribucion_normal
 
 matriz_correlaciones_baseball <- cor(baseball)
 
+svg("out/baseball/matriz_correlaciones_baseball.svg")
 corrplot(matriz_correlaciones_baseball, method = "ellipse")
-
+dev.off()
 
 
 
