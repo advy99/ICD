@@ -6,6 +6,27 @@ library(corrplot)
 library(GGally)
 
 #
+# Funciones
+#
+
+mostrar_grafico_densidad <- function(datos, nombre_variable) {
+	ggplot(data = datos, aes_string(x = nombre_variable, fill = "Class")) +
+		geom_density(alpha = 0.5) + 
+		ggtitle(paste("Densidad de valores de ", nombre_variable, " por cada clase."))
+}
+
+mostrar_boxplot <- function(datos, nombre_variable) {
+	ggplot(data = datos, aes_string(x = nombre_variable, fill = "Class")) +
+		geom_boxplot() + 
+		ggtitle(paste("Boxplot de ", nombre_variable, " por cada clase."))
+}
+
+mostrar_grafico_qq <- function(datos, nombre) {
+	qqnorm(datos, main = paste("Normal Q-Q Plot: ", nombre))
+	qqline(datos)
+}
+
+#
 # Clasificación
 #
 
@@ -43,18 +64,18 @@ any(is.na(iris))
 
 # calculamos medidas de interes
 # las calculamos sin tener en cuenta la clase de salida
-medias_iris <- apply(iris[,-5], 2, mean)
-medias_iris
 
-sd_iris <- apply(iris[, -5], 2, sd)
-sd_iris
+# utilizamos una lista con las medidas de interes
+medidas <- list(medias = mean, 
+				desviacion_estandar = sd, 
+				minimos = min, 
+				maximos = max)
 
-minimos_iris <- apply(iris[,-5], 2, min)
-minimos_iris
-
-maximos_iris <- apply(iris[,-5], 2, max)
-maximos_iris
-
+# aplicamos cada medida a iris por columnas
+medidas_iris <- lapply(medidas, function(funcion_medida) {
+									apply(iris[,-5], 2, funcion_medida)
+								} )
+medidas_iris
 
 
 # graficamos los datos
@@ -63,33 +84,20 @@ maximos_iris
 ggpairs(iris, aes(colour = Class)) + theme_minimal()
 
 
-mostrar_grafico_densidad <- function(nombre_variable) {
-	ggplot(data = iris, aes_string(x = nombre_variable, fill = "Class")) +
-		geom_density(alpha = 0.5) + 
-		ggtitle(paste("Densidad de valores de ", nombre_variable, " por cada clase."))
-}
 
-mostrar_grafico_densidad("SepalLength")
-mostrar_grafico_densidad("SepalWidth")
-mostrar_grafico_densidad("PetalLength")
-mostrar_grafico_densidad("PetalWidth")
-
-mostrar_boxplot <- function(nombre_variable) {
-	ggplot(data = iris, aes_string(x = nombre_variable, fill = "Class")) +
-		geom_boxplot() + 
-		ggtitle(paste("Boxplot de ", nombre_variable, " por cada clase."))
-}
-
-mostrar_boxplot("SepalLength")
-mostrar_boxplot("SepalWidth")
-mostrar_boxplot("PetalLength")
-mostrar_boxplot("PetalWidth")
+mostrar_grafico_densidad(iris, "SepalLength")
+mostrar_grafico_densidad(iris, "SepalWidth")
+mostrar_grafico_densidad(iris, "PetalLength")
+mostrar_grafico_densidad(iris, "PetalWidth")
 
 
-mostrar_grafico_qq <- function(datos, nombre) {
-	qqnorm(datos, main = paste("Normal Q-Q Plot: ", nombre))
-	qqline(datos)
-}
+mostrar_boxplot(iris, "SepalLength")
+mostrar_boxplot(iris, "SepalWidth")
+mostrar_boxplot(iris, "PetalLength")
+mostrar_boxplot(iris, "PetalWidth")
+
+
+
 
 
 par(mfrow=c(2,2))
@@ -106,5 +114,7 @@ apply(iris[, -5], 2, shapiro.test)
 matriz_correlaciones_iris <- cor(iris[, -5])
 
 corrplot(matriz_correlaciones_iris, method = "ellipse")
+
+
 
 
