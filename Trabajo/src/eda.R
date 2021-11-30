@@ -154,6 +154,7 @@ apply(iris[, -5], 2, shapiro.test)
 
 
 matriz_correlaciones_iris <- cor(iris[, -5])
+matriz_correlaciones_iris
 
 svg("out/iris/matriz_correlaciones_iris.svg")
 corrplot(matriz_correlaciones_iris, method = "ellipse")
@@ -267,6 +268,8 @@ sigue_distribucion_normal
 
 
 matriz_correlaciones_baseball <- cor(baseball)
+matriz_correlaciones_baseball
+
 
 svg("out/baseball/matriz_correlaciones_baseball.svg")
 corrplot(matriz_correlaciones_baseball, method = "ellipse")
