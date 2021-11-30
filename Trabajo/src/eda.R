@@ -118,3 +118,113 @@ corrplot(matriz_correlaciones_iris, method = "ellipse")
 
 
 
+
+
+
+
+#
+# Regresión
+#
+
+
+# leemos el fichero de datos
+baseball <- read.csv("data/baseball/baseball.dat", comment.char = "@", header = FALSE)
+
+# vamos a mirar las primeras filas
+head(baseball)
+
+# cambiamos los nombres de los atributos, no los ha leido bien el read.csv
+names(baseball) <- c("Batting_average", "On-base_percentage", "Runs", "Hits", 
+					 "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+					 "Strike-Outs", "Stolen_bases", "Errors", 
+					 "Free_agency_eligibility", "Free_agent", 
+					 "Arbitration_eligibility", "Arbitration", "Salary")
+
+head(baseball)
+
+# miramos cuantas filas tenemos de datos
+dim(baseball)
+
+# miramos los tipos de los datos
+str(baseball)
+
+summary(baseball)
+
+# el missmap nos modifica los valores por defecto de plot
+# y luego el qqplot no se verá bien, así que los restauramos despues del missmap
+par_default <- par(mar = c(0, 0, 0, 0))
+# miramos si tenemos valores perdidos
+missmap(baseball)
+par(par_default)
+
+any(is.na(baseball))
+
+
+# calculamos medidas de interes
+# las calculamos sin tener en cuenta la clase de salida
+
+# utilizamos una lista con las medidas de interes
+medidas <- list(medias = mean, 
+				desviacion_estandar = sd, 
+				minimos = min, 
+				maximos = max)
+
+# aplicamos cada medida a baseball por columnas
+medidas_baseball <- lapply(medidas, function(funcion_medida) {
+	apply(baseball, 2, funcion_medida)
+} )
+medidas_baseball
+
+
+# graficamos los datos
+
+# vistazo general
+ggpairs(baseball) + theme_minimal()
+
+#
+## CUIDADO!!! LAS ESCALAS ESTAN LIBRES PORQUE NO SE HAN ESCALADO LOS DATOS
+#
+# He decidido no escalarlos de cada a ver los valores reales de los atributos, así
+# que hay que mirar cada grafico por separado
+ggplot(baseball %>% gather(), aes(x = value)) +
+	geom_boxplot() + 
+	coord_flip() +
+	facet_wrap(~key, scales = "free")
+
+
+ggplot(baseball %>% gather, aes(x = value)) +
+	geom_density(alpha = 0.5, fill = "red") + 
+	facet_wrap(~key, scales = "free")
+
+
+
+# tenemos 17 variables, hacemos primero 9 y luego las 8 restantes
+par(mfrow=c(3,3))
+lapply(colnames(baseball[1:9]), function(col_name) { mostrar_grafico_qq(baseball[,col_name], col_name) } )
+lapply(colnames(baseball[10:17]), function(col_name) { mostrar_grafico_qq(baseball[,col_name], col_name) } )
+par(mfrow=c(1,1))
+
+
+# test de normalidad sobre las características
+resultados_test_normalidad <- apply(baseball, 2, shapiro.test)
+
+# si su p-value es menor que 0.05 rechazamos la hipotesis de que sigue una distribución normal
+sigue_distribucion_normal <- lapply(resultados_test_normalidad, function(x) x$p.value > 0.05)
+
+# los que no rechacen supondremos que siguen una normal
+sigue_distribucion_normal
+
+# como podemos ver en los p-value, rechazamos la hipotesis nula de que los datos siguen
+# una distribución normal a excepción de la segunda característica, SepalWidth ,por muy poco
+
+
+matriz_correlaciones_baseball <- cor(baseball)
+
+corrplot(matriz_correlaciones_baseball, method = "ellipse")
+
+
+
+
+
+
+
