@@ -80,7 +80,118 @@ lapply(fit_lm_baseball, function (fit) {
 })
 
 
+#
+# Regresión lineal multiple
+#
+
+# aplicamos construcción del modelo top-down
+
+fit_lm_multiple <- lm(Salary ~ ., data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6865
+
+# eliminamos la menos significativas: las que tienen mayor p-value
+fit_lm_multiple <- lm(Salary ~ . - Doubles, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6865
+
+# eliminamos la menos significativas
+
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits, data = baseball)
+
+summary(fit_lm_multiple)
+# conseguimos un adjusted R-sqared de 0.6878
+
+# eliminamos la menos significativas
+
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average, data = baseball)
+
+summary(fit_lm_multiple)
+# conseguimos un adjusted R-sqared de 0.6881
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6883
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage`, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6886
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6883, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6874, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6865, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs, data = baseball)
+
+summary(fit_lm_multiple)
 
 
+# conseguimos un adjusted R-sqared de 0.685, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
 
 
+# A partir de este punto eliminamos características con un p-value < 0.05, por lo que
+# podríamos considerarlas significativas, aun así seguiré para probar un modelo simple
+#
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs - Free_agent, data = baseball)
+
+summary(fit_lm_multiple)
+
+
+# conseguimos un adjusted R-sqared de 0.68, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs - Free_agent - HomeRuns, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.67, en este punto hemos bajado un 1% de golpe,
+# y eliminando una variable considerada significativa, por lo que el modelo final será el anterior
+# a este
+
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs - Free_agent, data = baseball)
+
+summary(fit_lm_multiple)
+
+calcular_MSE(baseball$Salary, predict(fit_lm_multiple, baseball))
+calcular_RMSE(baseball$Salary, predict(fit_lm_multiple, baseball))
+
+# como vemos, hemos bajado de 920 de MSE y 923 de RMSE a 693 y 695 respectivamente,
+# y de un adjusted R-squared de 0.4451 a uno de 0.6806, mejoras bastante significativas
