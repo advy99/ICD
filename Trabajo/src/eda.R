@@ -97,7 +97,12 @@ mostrar_boxplot(iris, "PetalLength")
 mostrar_boxplot(iris, "PetalWidth")
 
 
-
+ggplot(iris, aes(x = Class, fill = Class)) +
+	geom_bar() +
+	guides(fill = FALSE) +
+	xlab("Número de observaciones") +
+	ylab("Clases") +
+	ggtitle("Recuento de observaciones para cada clase")
 
 
 par(mfrow=c(2,2))
