@@ -1,6 +1,7 @@
 library(tidyverse)
 library(readr)
-
+library(GGally)
+library(corrplot)
 
 #
 # Funciones
@@ -195,3 +196,56 @@ calcular_RMSE(baseball$Salary, predict(fit_lm_multiple, baseball))
 
 # como vemos, hemos bajado de 920 de MSE y 923 de RMSE a 693 y 695 respectivamente,
 # y de un adjusted R-squared de 0.4451 a uno de 0.6806, mejoras bastante significativas
+
+
+# probamos interacciones: voy  a probar entre predictores que estén correlados entre si, y
+# cada uno de ellos con el salario
+# pruebo interaccion HomeRuns y Runs en las que batea
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
+									  `On-base_percentage` - Triples - Arbitration - Errors - 
+									  Runs - Free_agent + HomeRuns*Runs_batted_in, 
+									  data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+# como vemos, esta interacción no es importante (aunque por muy poco)
+
+# esta interacción la ha considerado importante, aunque no ha mejorado mucho el R-squared
+
+
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration - Errors - 
+										Runs - Free_agent + Runs*Hits, 
+										data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+# eliminamos HomeRuns, ya que con esta interacción ha considerado que no es importante
+# ya que la información que aporta seguramente la aporte esta nueva interaccion
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration - Errors - 
+										Runs - Free_agent - HomeRuns + Runs*Hits, 
+									data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+# voy a probar tambien entre batting_average y on-base-percentage, ya que 
+# creo que puede existir asociación entre el porcentaje de veces que llega a una base
+# y la media de veces que una persona batea
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Walks - 
+										Triples - Arbitration - Errors - 
+										Runs - Free_agent - HomeRuns + 
+										Runs*Hits + Batting_average*`On-base_percentage`, 
+									data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+# no ha funcionado, probamos otra combinacion
+
+
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration - Errors - 
+										Runs - Free_agent - HomeRuns + Runs*Hits, 
+									data = baseball)
+
+summary(fit_lm_multiple_interacciones)
