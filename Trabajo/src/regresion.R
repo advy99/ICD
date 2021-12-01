@@ -394,4 +394,94 @@ calcular_RMSE(baseball$Salary, fit_knn_mejor_lm$fitted.values)
 
 # como vemos la opción con la formula de lm es algo mejor, pero tampoco mucho
 
+nombre <- "data/baseball/baseball"
+
+run_lm_fold <- function(i, x, tt = "test") {
+	file <- paste(x, "-5-", i, "tra.dat", sep="")
+	x_tra <- read.csv(file, comment.char="@", header=FALSE)
+	file <- paste(x, "-5-", i, "tst.dat", sep="")
+	x_tst <- read.csv(file, comment.char="@", header=FALSE)
+	names(x_tra) <- c("Batting_average", "On-base_percentage", "Runs", "Hits", 
+						 "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+						 "Strike-Outs", "Stolen_bases", "Errors", 
+						 "Free_agency_eligibility", "Free_agent", 
+						 "Arbitration_eligibility", "Arbitration", "Salary")
+	
+	names(x_tst) <- c("Batting_average", "On-base_percentage", "Runs", "Hits", 
+					  "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+					  "Strike-Outs", "Stolen_bases", "Errors", 
+					  "Free_agency_eligibility", "Free_agent", 
+					  "Arbitration_eligibility", "Arbitration", "Salary")
+	
+	if (tt == "train") {
+		test <- x_tra
+	}
+	else {
+		test <- x_tst
+	}
+	
+	fitMulti=lm(Salary ~ . + Doubles - Batting_average - Walks - 
+					`On-base_percentage` - Triples - Arbitration + Errors - 
+					Free_agent - HomeRuns + Runs*Hits + 
+					Free_agency_eligibility * Runs_batted_in +
+					Arbitration_eligibility * Runs_batted_in +
+					I(Doubles^3 + Doubles^2) + 
+					I(Errors^2 + Errors^3), data = x_tra)
+	
+	yprime=predict(fitMulti,test)
+	sum(abs(test$Salary-yprime)^2)/length(yprime) ##MSE
+}
+
+lmMSEtrain<-mean(sapply(1:5,run_lm_fold,nombre,"train"))
+lmMSEtest<-mean(sapply(1:5,run_lm_fold,nombre,"test"))
+
+
+
+run_knn_fold <- function(i, x, tt = "test") {
+	file <- paste(x, "-5-", i, "tra.dat", sep="")
+	x_tra <- read.csv(file, comment.char="@", header=FALSE)
+	file <- paste(x, "-5-", i, "tst.dat", sep="")
+	x_tst <- read.csv(file, comment.char="@", header=FALSE)
+	In <- length(names(x_tra)) - 1
+	names(x_tra) <- c("Batting_average", "On-base_percentage", "Runs", "Hits", 
+					  "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+					  "Strike-Outs", "Stolen_bases", "Errors", 
+					  "Free_agency_eligibility", "Free_agent", 
+					  "Arbitration_eligibility", "Arbitration", "Salary")
+	
+	names(x_tst) <- c("Batting_average", "On-base_percentage", "Runs", "Hits", 
+					  "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+					  "Strike-Outs", "Stolen_bases", "Errors", 
+					  "Free_agency_eligibility", "Free_agent", 
+					  "Arbitration_eligibility", "Arbitration", "Salary")
+	
+	if (tt == "train") {
+		test <- x_tra
+	}
+	else {
+		test <- x_tst
+	}
+	
+	fitMulti=kknn(Salary ~ . + Doubles - Batting_average - Walks - 
+					`On-base_percentage` - Triples - Arbitration + Errors - 
+					Free_agent - HomeRuns + Runs*Hits + 
+					Free_agency_eligibility * Runs_batted_in +
+					Arbitration_eligibility * Runs_batted_in +
+					I(Doubles^3 + Doubles^2) + 
+					I(Errors^2 + Errors^3),x_tra, test)
+	
+	yprime=fitMulti$fitted.values
+	sum(abs(test$Salary - yprime)^2)/length(yprime) ##MSE
+}
+
+knnMSEtrain<-mean(sapply(1:5,run_knn_fold,nombre,"train"))
+knnMSEtest<-mean(sapply(1:5,run_knn_fold,nombre,"test"))
+
+
+lmMSEtrain
+lmMSEtest
+
+knnMSEtrain
+knnMSEtest
+
 
