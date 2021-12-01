@@ -2,6 +2,9 @@ library(tidyverse)
 library(readr)
 library(GGally)
 library(corrplot)
+library(kknn)
+
+set.seed(2)
 
 #
 # Funciones
@@ -330,3 +333,65 @@ fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Wal
 summary(fit_lm_multiple_no_linealidad)
 
 # como vemos este tampoco ha funcionado
+
+# probamos con Errors
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration + Errors - 
+										Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) + 
+										I(Errors^2), 
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# si lo considera significativo, subiendo el adjusted R-squared a 0.7499
+
+# probamos con Errors al cubo
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration + Errors - 
+										Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) + 
+										I(Errors^2 + Errors^3), 
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# mejora un poco, pero nada significativo
+
+# este será nuestro modelo final
+calcular_MSE(baseball$Salary, predict(fit_lm_multiple_no_linealidad, baseball))
+calcular_RMSE(baseball$Salary, predict(fit_lm_multiple_no_linealidad, baseball))
+
+# hemos bajado de 391673.8 y 627.7039 MSE y RMSE respectivamente a 367189.1 y 607.7675,
+# y de un adjusted R-squared de 0.7367 a uno de 0.7501, mejoras bastante significativas
+
+
+#
+# KNN
+#
+
+# por defecto kernel = optimal y scale = TRUE
+fit_knn <- kknn(Salary ~ ., baseball, baseball)
+
+calcular_MSE(baseball$Salary, fit_knn$fitted.values)
+calcular_RMSE(baseball$Salary, fit_knn$fitted.values)
+
+fit_knn_mejor_lm <- fit_knn <- kknn(Salary ~ . + Doubles - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration + Errors - 
+										Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) + 
+										I(Errors^2 + Errors^3), 
+									baseball, baseball)
+
+calcular_MSE(baseball$Salary, fit_knn_mejor_lm$fitted.values)
+calcular_RMSE(baseball$Salary, fit_knn_mejor_lm$fitted.values)
+
+# como vemos la opción con la formula de lm es algo mejor, pero tampoco mucho
+
+
