@@ -240,12 +240,26 @@ fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Walks -
 
 summary(fit_lm_multiple_interacciones)
 
-# no ha funcionado, probamos otra combinacion
-
-
+# no ha funcionado, probamos otra combinacion, esta vez la interacción entre las
+# dos consideradas más significativas
 fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
 										`On-base_percentage` - Triples - Arbitration - Errors - 
-										Runs - Free_agent - HomeRuns + Runs*Hits, 
+										Runs - Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in, 
 									data = baseball)
 
 summary(fit_lm_multiple_interacciones)
+
+# ha funcionado bastante bien, pasamos de un r^2 de 0.68 a uno de 0.7145
+
+# como la anterior ha funcionado, pruebo tambien Runs_batted_in con Arbitration_eligibility
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration - Errors - 
+										Runs - Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in, 
+									data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+# tambien ha funcionado bien, r^2 pasa de 0.71 a 0.7367
