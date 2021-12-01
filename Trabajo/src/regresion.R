@@ -8,7 +8,7 @@ library(corrplot)
 #
 
 calcular_MSE <- function(valores_reales, valores_predecidos) {
-	sqrt(sum((valores_predecidos - valores_reales)^2)/length(valores_reales))
+	sum((valores_predecidos - valores_reales)^2)/length(valores_reales)
 }
 
 calcular_RMSE <- function(valores_reales, valores_predecidos) {
@@ -194,7 +194,7 @@ summary(fit_lm_multiple)
 calcular_MSE(baseball$Salary, predict(fit_lm_multiple, baseball))
 calcular_RMSE(baseball$Salary, predict(fit_lm_multiple, baseball))
 
-# como vemos, hemos bajado de 920 de MSE y 923 de RMSE a 693 y 695 respectivamente,
+# como vemos, hemos bajado de 848113.1 de MSE y 923 de RMSE a 480894.9 y 695 respectivamente,
 # y de un adjusted R-squared de 0.4451 a uno de 0.6806, mejoras bastante significativas
 
 
@@ -203,63 +203,130 @@ calcular_RMSE(baseball$Salary, predict(fit_lm_multiple, baseball))
 # pruebo interaccion HomeRuns y Runs en las que batea
 fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
 									  `On-base_percentage` - Triples - Arbitration - Errors - 
-									  Runs - Free_agent + HomeRuns*Runs_batted_in, 
+									  Runs - Free_agent + Free_agency_eligibility*Runs_batted_in, 
 									  data = baseball)
 
 summary(fit_lm_multiple_interacciones)
 
 # como vemos, esta interacción no es importante (aunque por muy poco)
 
+
+# probamos la interaccion entre Runs y Hits, ya que tiene sentido que estas dos
+# tengan relacion con el salario
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration - Errors - 
+										 Free_agent + Runs*Hits, 
+										data = baseball)
 # esta interacción la ha considerado importante, aunque no ha mejorado mucho el R-squared
 
-
-fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
-										`On-base_percentage` - Triples - Arbitration - Errors - 
-										Runs - Free_agent + Runs*Hits, 
-										data = baseball)
 
 summary(fit_lm_multiple_interacciones)
 
 # eliminamos HomeRuns, ya que con esta interacción ha considerado que no es importante
 # ya que la información que aporta seguramente la aporte esta nueva interaccion
-fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks - 
 										`On-base_percentage` - Triples - Arbitration - Errors - 
-										Runs - Free_agent - HomeRuns + Runs*Hits, 
-									data = baseball)
+										 Free_agent - HomeRuns + Runs*Hits, 
+										data = baseball)
 
 summary(fit_lm_multiple_interacciones)
 
 # voy a probar tambien entre batting_average y on-base-percentage, ya que 
 # creo que puede existir asociación entre el porcentaje de veces que llega a una base
 # y la media de veces que una persona batea
-fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Walks - 
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Walks - 
 										Triples - Arbitration - Errors - 
-										Runs - Free_agent - HomeRuns + 
+										Free_agent - HomeRuns + 
 										Runs*Hits + Batting_average*`On-base_percentage`, 
-									data = baseball)
+										data = baseball)
 
 summary(fit_lm_multiple_interacciones)
 
 # no ha funcionado, probamos otra combinacion, esta vez la interacción entre las
 # dos consideradas más significativas
-fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks - 
 										`On-base_percentage` - Triples - Arbitration - Errors - 
-										Runs - Free_agent - HomeRuns + Runs*Hits + 
+										Free_agent - HomeRuns + Runs*Hits + 
 										Free_agency_eligibility * Runs_batted_in, 
-									data = baseball)
+										data = baseball)
 
 summary(fit_lm_multiple_interacciones)
 
 # ha funcionado bastante bien, pasamos de un r^2 de 0.68 a uno de 0.7145
 
 # como la anterior ha funcionado, pruebo tambien Runs_batted_in con Arbitration_eligibility
-fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks - 
 										`On-base_percentage` - Triples - Arbitration - Errors - 
-										Runs - Free_agent - HomeRuns + Runs*Hits + 
+										Free_agent - HomeRuns + Runs*Hits + 
 										Free_agency_eligibility * Runs_batted_in +
 										Arbitration_eligibility * Runs_batted_in, 
-									data = baseball)
+										data = baseball)
 
 summary(fit_lm_multiple_interacciones)
 
 # tambien ha funcionado bien, r^2 pasa de 0.71 a 0.7367
+
+# calculamos el MSE y RMSE con las interacciones
+calcular_MSE(baseball$Salary, predict(fit_lm_multiple_interacciones, baseball))
+calcular_RMSE(baseball$Salary, predict(fit_lm_multiple_interacciones, baseball))
+
+# hemos bajado de 480894.9 y 695 MSE y RMSE respectivamente a 391673.8 y 627.7039,
+# y de un adjusted R-squared de 0.6806 a uno de 0.7367, mejoras bastante significativas
+
+
+# pasamos a probar no linealidad
+
+# voy a probar con algunos predictores que no funcionaron de forma lineal
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration - Errors - 
+										Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^2), 
+										data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# tras introducir el termino de no linealidad con doubles este predictor si ha pasado a tener importancia
+
+
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration - Errors - 
+										Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) , 
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# si en lugar de al cuadrado introducimos la caracteristica al cubo mejoramos
+# un poco más el adjusted R-squared hasta llegar al 0.7414
+
+# probamos batting average
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles + Batting_average - Walks - 
+										`On-base_percentage` - Triples - Arbitration - Errors - 
+										Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) +
+										I(Batting_average^2), 
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# como vemos no ha funcionado, así que lo eliminamos
+# y como doubles ha funcionado, vamos a probar con los triples
+
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks - 
+										`On-base_percentage` + Triples - Arbitration - Errors - 
+										Free_agent - HomeRuns + Runs*Hits + 
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) + 
+										I(Triples^2), 
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# como vemos este tampoco ha funcionado
