@@ -3,6 +3,7 @@ library(readr)
 library(GGally)
 library(corrplot)
 library(kknn)
+library(readr)
 
 set.seed(2)
 
@@ -474,8 +475,8 @@ run_knn_fold <- function(i, x, tt = "test") {
 	sum(abs(test$Salary - yprime)^2)/length(yprime) ##MSE
 }
 
-knnMSEtrain<-mean(sapply(1:5,run_knn_fold,nombre,"train"))
-knnMSEtest<-mean(sapply(1:5,run_knn_fold,nombre,"test"))
+knnMSEtrain <- mean(sapply(1:5,run_knn_fold,nombre,"train"))
+knnMSEtest <- mean(sapply(1:5,run_knn_fold,nombre,"test"))
 
 
 lmMSEtrain
@@ -483,5 +484,51 @@ lmMSEtest
 
 knnMSEtrain
 knnMSEtest
+
+tabla_resultados_test <- read.csv("data/regr_test_alumnos.csv")
+tabla_resultados_test
+
+tabla_resultados_test[5, 2] <- lmMSEtest
+tabla_resultados_test[5, 3] <- knnMSEtest
+tabla_resultados_test
+
+tabla_resultados_train <- read.csv("data/regr_train_alumnos.csv")
+tabla_resultados_train
+
+tabla_resultados_train[5, 2] <- lmMSEtrain
+tabla_resultados_train[5, 3] <- knnMSEtrain
+tabla_resultados_train
+
+#
+# Comparativa LM y KNN con los resultados obtenidos
+# 
+
+tablatst <- cbind(tabla_resultados_test[,2:dim(tabla_resultados_test)[2]])
+colnames(tablatst) <- names(tabla_resultados_test)[2:dim(tabla_resultados_test)[2]]
+rownames(tablatst) <- tabla_resultados_test[,1]
+
+# sacamos las diferencias usando la tabla de test
+difs <- (tablatst[,1] - tablatst[,2]) / tablatst[,1]
+wilc_1_2 <- cbind(ifelse (difs<0, abs(difs)+0.1, 0+0.1), ifelse (difs>0, abs(difs)+0.1, 0+0.1))
+colnames(wilc_1_2) <- c(colnames(tablatst)[1], colnames(tablatst)[2])
+head(wilc_1_2)
+
+LMvsKNNtst <- wilcox.test(wilc_1_2[,1], wilc_1_2[,2], alternative = "two.sided", paired=TRUE)
+Rmas <- LMvsKNNtst$statistic
+pvalue <- LMvsKNNtst$p.value
+LMvsKNNtst <- wilcox.test(wilc_1_2[,2], wilc_1_2[,1], alternative = "two.sided", paired=TRUE)
+Rmenos <- LMvsKNNtst$statistic
+Rmas
+Rmenos
+pvalue
+
+# como el p-value es tan alto, no podemos decir que haya diferencias significativas
+# entre LM y KNN para los conjuntos de datos que hemos usado
+
+
+#
+# Comparativa de los tres algoritmos usando Friedman y Holms
+#
+
 
 
