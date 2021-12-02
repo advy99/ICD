@@ -530,5 +530,19 @@ pvalue
 # Comparativa de los tres algoritmos usando Friedman y Holms
 #
 
+test_friedman <- friedman.test(as.matrix(tablatst))
+test_friedman
 
+# el test de friedman nos dice que con un nivel de confianza de más del 98%,
+# si hay diferencias significativas entre alguno de los tres metodos
 
+tam <- dim(tablatst)
+groups <- rep(1:tam[2], each=tam[1])
+pairwise.wilcox.test(as.matrix(tablatst), groups, p.adjust = "holm", paired = TRUE)
+
+# con este resultado podemos concluir que hay diferencias significativas entre 
+# el tercer y el primer algoritmo (a favor del tercer algoritmo),
+# pero no entre el primero y el segundo y el segundo y el terceo (aunque con este último
+# si que las hay si el nivel de confianza es del 90% y no del 5%)
+# Por lo tanto, el tercer algoritmo (M5) es mejor que el primero, pero con el 
+# segundo no tenemos tan claro una mejora
