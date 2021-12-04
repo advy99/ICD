@@ -4,8 +4,33 @@ library(GGally)
 library(corrplot)
 library(class)
 library(caret)
+library(ggplot2)
+library(scales)
 
-set.seed(1)
+set.seed(0)
+
+
+calcular_accuracy <- function(valores_reales, valores_predichos) {
+	sum(valores_reales == valores_predichos) / length(valores_reales)
+}
+
+ggplotConfusionMatrix <- function(matriz){
+	titulo <- paste("Accuracy: ", round(matriz$overall[1] * 100, 2), "% \t",
+					 "Kappa: ", round(matriz$overall[2] * 100, 2), "%")
+	
+	grafico <- ggplot(data = as.data.frame(matriz$table) ,
+				   aes(x = Reference, y = Prediction)) +
+				   xlab("Valor real") +
+				   ylab("Valor predicho") +
+				   geom_tile(aes(fill = log(Freq)), colour = "white") +
+				   scale_fill_gradient(low = "white", high = "steelblue") +
+				   geom_text(aes(x = Reference, y = Prediction, label = Freq)) +
+				   theme(legend.position = "none") +
+				   ggtitle(titulo)
+	
+	grafico
+}
+
 
 # leemos el fichero de datos
 iris <- read.csv("data/iris/iris.dat", comment.char = "@", header = FALSE)
@@ -24,7 +49,7 @@ iris <- iris %>% mutate_if(is.numeric, scale, center = TRUE, scale = TRUE)
 
 summary(iris)
 
-# separamos en training y test (90 / 10)
+# separamos en training y test
 PORCENTAJE_TEST = 0.2
 muestras_train <- sample(nrow(iris), nrow(iris) * (1 - PORCENTAJE_TEST))
 
@@ -39,4 +64,24 @@ iris_train_etiquetas <- iris[muestras_train, 5]
 iris_test_etiquetas <- iris[-muestras_train, 5]
 
 
+# no hace falta escalar, ya hemos escalado antes
+# buscamos la mejor k entre 1 y 20
+modelo_knn <- train(iris_train, iris_train_etiquetas, method = "knn", 
+					metric="Accuracy", tuneGrid = data.frame(.k=1:20),
+					trControl = trainControl(method = "cv"))
 
+# miramos el resultado, que nos dirá la mejor k
+modelo_knn
+
+# predecimos con los datos de test
+predicciones_test <- predict(modelo_knn, newdata = iris_test)
+
+# miramos accuracy y kappa
+postResample(pred = predicciones_test, obs = iris_test_etiquetas)
+
+table(iris_test_etiquetas, predicciones_test)
+
+matriz_confusion <- confusionMatrix(factor(predicciones_test), factor(iris_test_etiquetas), dnn = c("Prediction", "Reference"))
+matriz_confusion
+
+ggplotConfusionMatrix(matriz_confusion)
