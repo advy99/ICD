@@ -141,13 +141,16 @@ ggplot(iris, aes(x = Class, fill = Class)) +
 	ggtitle("Recuento de observaciones para cada clase")
 ggsave("out/iris/recuento_clases_iris.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
-
+# miramos si cada característica sigue una distribución normal 
 par(mfrow=c(2,2))
 lapply(colnames(iris[,-5]), function(col_name) { mostrar_grafico_qq(iris[,col_name], col_name, save_plot = TRUE) } )
 par(mfrow=c(1,1))
 
-# test de normalidad sobre las características
-apply(iris[, -5], 2, shapiro.test)
+
+
+# test de normalidad sobre las características, separado por cada clase
+apply(iris %>% select_if(is.numeric), 2, shapiro.test)
+
 
 # como podemos ver en los p-value, rechazamos la hipotesis nula de que los datos siguen
 # una distribución normal a excepción de la segunda característica, SepalWidth ,por muy poco
