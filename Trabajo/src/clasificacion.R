@@ -110,7 +110,7 @@ plot_matriz_confusion(matriz_confusion)
 
 # 2. Cada clase sigue una distribución normal
 
-# ya esta en el EDA, pero volvemos a comprobar
+# comprobamos por separado en cada clase
 apply(iris %>% filter(as.integer(Class) == 1) %>% select_if(is.numeric), 2, shapiro.test)
 apply(iris %>% filter(as.integer(Class) == 2) %>% select_if(is.numeric), 2, shapiro.test)
 apply(iris %>% filter(as.integer(Class) == 3) %>% select_if(is.numeric), 2, shapiro.test)
@@ -141,7 +141,6 @@ leveneTest(PetalWidth ~ Class, iris)
 
 lda_fit <- train(iris_train, iris_train_etiquetas,
 				method = "lda",
-				tuneLength = 10,
 				trControl = trainControl(method = "cv", number = 10))
 
 lda_fit
@@ -155,7 +154,6 @@ lda_fit
 
 qda_fit <- train(iris_train, iris_train_etiquetas,
 				 method = "qda",
-				 tuneLength = 10,
 				 trControl = trainControl(method = "cv", number = 10))
 
 qda_fit
