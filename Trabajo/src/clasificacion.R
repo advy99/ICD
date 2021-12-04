@@ -159,3 +159,47 @@ qda_fit <- train(iris_train, iris_train_etiquetas,
 qda_fit
 
 
+
+#
+# comparacion entre los tres modelos
+#
+nombre <- "data/iris/iris"
+
+run_method_fold <- function(i, x, metodo, tt = "test") {
+	file <- paste(x, "-5-", i, "tra.dat", sep="")
+	x_tra <- read.csv(file, comment.char="@", header=FALSE)
+	file <- paste(x, "-5-", i, "tst.dat", sep="")
+	x_tst <- read.csv(file, comment.char="@", header=FALSE)
+	In <- length(names(x_tra)) - 1
+	names(x_tra) <- c("SepalLength", "SepalWidth", "PetalLength", "PetalWidth", "Class")
+	
+	names(x_tst) <- c("SepalLength", "SepalWidth", "PetalLength", "PetalWidth", "Class")
+	
+	x_tra$Class <- as.factor(x_tra$Class)
+	
+	x_tst$Class <- as.factor(x_tst$Class)
+	
+	x_tra_labels <- x_tra[, 5]
+	x_tra <- x_tra[, -5]
+	
+	x_tst_labels <- x_tst[, 5]
+	x_tst <- x_tst[, -5]
+	
+	if (tt == "train") {
+		test_labels <- x_tra_labels
+		test <- x_tra
+	}
+	else {
+		test_labels <- x_tst_labels
+		test <- x_tst
+	}
+	
+	modelo = train(x_tra, x_tra_labels,
+					 method = metodo)
+	
+	yprime = predict(modelo,test)
+	# calculamos accuracy
+	calcular_accuracy(test_labels, yprime)
+}
+
+
