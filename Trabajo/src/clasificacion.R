@@ -31,6 +31,13 @@ ggplotConfusionMatrix <- function(matriz){
 	grafico
 }
 
+mostrar_avance_accuracy_k <- function(resultados_caret) {
+	ggplot(resultados_caret, aes(x = k, y = Accuracy)) +
+		geom_line() +
+		geom_point() +
+		ggtitle("Accuracy del modelo en función del valor de K escogido")
+}
+
 
 # leemos el fichero de datos
 iris <- read.csv("data/iris/iris.dat", comment.char = "@", header = FALSE)
@@ -72,6 +79,8 @@ modelo_knn <- train(iris_train, iris_train_etiquetas, method = "knn",
 
 # miramos el resultado, que nos dirá la mejor k
 modelo_knn
+
+mostrar_avance_accuracy_k(modelo_knn$results)
 
 # predecimos con los datos de test
 predicciones_test <- predict(modelo_knn, newdata = iris_test)
