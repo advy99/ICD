@@ -165,12 +165,12 @@ qda_fit
 #
 nombre <- "data/iris/iris"
 
-run_method_fold <- function(i, x, metodo, tt = "test") {
-	file <- paste(x, "-5-", i, "tra.dat", sep="")
+run_method_fold <- function(i, x, metodo) {
+	file <- paste(x, "-10-", i, "tra.dat", sep="")
 	x_tra <- read.csv(file, comment.char="@", header=FALSE)
-	file <- paste(x, "-5-", i, "tst.dat", sep="")
+	file <- paste(x, "-10-", i, "tst.dat", sep="")
 	x_tst <- read.csv(file, comment.char="@", header=FALSE)
-	In <- length(names(x_tra)) - 1
+
 	names(x_tra) <- c("SepalLength", "SepalWidth", "PetalLength", "PetalWidth", "Class")
 	
 	names(x_tst) <- c("SepalLength", "SepalWidth", "PetalLength", "PetalWidth", "Class")
@@ -184,22 +184,44 @@ run_method_fold <- function(i, x, metodo, tt = "test") {
 	
 	x_tst_labels <- x_tst[, 5]
 	x_tst <- x_tst[, -5]
-	
-	if (tt == "train") {
-		test_labels <- x_tra_labels
-		test <- x_tra
+
+	if (metodo == "knn") {
+		modelo <- train(x_tra, x_tra_labels,
+					   method = metodo,
+					   tuneGrid = expand.grid(k = 9))
+	} else {
+		modelo <- train(x_tra, x_tra_labels,
+					   method = metodo)
 	}
-	else {
-		test_labels <- x_tst_labels
-		test <- x_tst
-	}
 	
-	modelo = train(x_tra, x_tra_labels,
-					 method = metodo)
 	
-	yprime = predict(modelo,test)
+	yprime_train <- predict(modelo,x_tra)
+	yprime_test <- predict(modelo,x_tst)
 	# calculamos accuracy
-	calcular_accuracy(test_labels, yprime)
+	accuracy_train <- calcular_accuracy(x_tra_labels, yprime_train)
+	accuracy_test <- calcular_accuracy(x_tst_labels, yprime_test)
+	
+	list(train = accuracy_train, test = accuracy_test)
+	
 }
 
+# metodos a usar
+metodos <- list(knn = "knn", lda = "lda", qda = "qda")
+# probe a tener una lista de parametros y pasarsela para cada modelo, sabiendo
+# el nombre del modelo, pero a la función train de caret no le gusta y no he encontrado 
+# forma de pasarles argumentos dependiendo del modelo
+# parametros a usar para cada metodo
+#parametros_modelos <- list(knn = list(k = modelo_knn$bestTune$k),  # para knn escogemos la mejor k obtenida
+#						   lda = list(), 
+#						   qda = list())
 
+resultados <- lapply(metodos, function(x) {
+	# obtenemos los resultados de un modelo
+	resultados_metodo <- sapply(1:10, run_method_fold, nombre, x)
+	# sacamos la media de train y test y ese es el resultado
+	media_train <- mean(unlist(resultados_metodo["train",]))
+	media_test <- mean(unlist(resultados_metodo["test",]))
+	list(train = media_train, test = media_test)
+})
+
+resultados
