@@ -1,0 +1,62 @@
+\documentclass[12pt, spanish]{article}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+
+% estilo personalizado
+\usepackage{src/estilo}
+
+
+\begin{document}
+
+% Página de titulo
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+    \centering
+    \vspace*{-2cm}
+    \includegraphics[scale = 0.50]{ugr.png}\\[0.3 cm]
+    %\textsc{\LARGE Universidad de Granada}\\[2.0 cm]
+    \textsc{\large Introducción a la Ciencia de Datos}\\[0.5 cm]
+    \textsc{\large Master en Ciencia de Datos e Ingeniería de Computadores}\\[0 cm]
+    \rule{\linewidth}{0.2 mm} \\[0.4cm]
+    { \Large \bfseries \thetitle}\\
+    \rule{\linewidth}{0.2 mm} \\[1 cm]
+
+     {\large
+      \emph{Autor: } \theauthor\\
+	   \emph{DNI:   }  77021623-M \\
+      \emph{Correo:} advy99@correo.ugr.es}
+
+	 \includegraphics[scale = 0.20]{logo_etsiit.png}\\[0.3 cm]
+    {\large \thedate}\\[0.5cm]
+	 \url{https://github.com/advy99/ICD/}
+    \doclicenseThis
+\end{titlepage}
+
+
+
+\pagestyle{fancy}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% indice
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% secciones
+%
+% \input{src/introduccion.tex}
+%
+% \input{src/eda.tex}
+%
+% \input{src/regresion.tex}
+%
+% \input{src/clasificacion.tex}
+
+
+\end{document}
