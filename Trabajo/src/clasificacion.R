@@ -8,6 +8,7 @@ library(ggplot2)
 library(scales)
 library(philentropy)
 library(MASS)
+library(car)
 
 
 set.seed(0)
@@ -17,34 +18,22 @@ calcular_accuracy <- function(valores_reales, valores_predichos) {
 	sum(valores_reales == valores_predichos) / length(valores_reales)
 }
 
-plot_matriz_confusion <- function(matriz){
-	titulo <- paste("Accuracy: ", round(matriz$overall[1] * 100, 2), "% \t",
+plot_matriz_confusion <- function(matriz, titulo = ""){
+	subtitulo <- paste("Accuracy: ", round(matriz$overall[1] * 100, 2), "% \t",
 					 "Kappa: ", round(matriz$overall[2] * 100, 2), "%")
 	
 	grafico <- ggplot(data = as.data.frame(matriz$table) ,
 				   aes(x = Reference, y = Prediction)) +
+				   labs(title = titulo, subtitle = subtitulo) +
 				   xlab("Valor real") +
 				   ylab("Valor predicho") +
 				   geom_tile(aes(fill = log(Freq)), colour = "white") +
 				   scale_fill_gradient(low = "white", high = "steelblue") +
 				   geom_text(aes(x = Reference, y = Prediction, label = Freq)) +
-				   theme(legend.position = "none") +
-				   ggtitle(titulo)
+				   theme(legend.position = "none")
 	
 	grafico
 }
-
-mostrar_avance_accuracy_k <- function(resultados_caret, nombre_disco = "") {
-	ggplot(resultados_caret, aes(x = k, y = Accuracy)) +
-		geom_line() +
-		geom_point() +
-		ggtitle("Accuracy del modelo en función del valor de K escogido")
-	
-	if (nombre_disco != "") {
-		ggsave(paste("out/iris/", nombre_disco, ".svg", sep = ""), device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
-	}
-}
-
 
 # leemos el fichero de datos
 iris <- read.csv("data/iris/iris.dat", comment.char = "@", header = FALSE)
@@ -88,15 +77,27 @@ modelo_knn <- train(iris_train, iris_train_etiquetas, method = "knn",
 modelo_knn
 
 # para ver el avance en test, entrenamos un knn con las distintas k y calculamos su accuracy en test
-resultados_test <- lapply(1:20, function(x) {knn(train = iris_train, test = iris_test, cl = iris_train_etiquetas, k = x)})
+resultados_test <- lapply(1:20, function(x) {
+	# entreno un modelo con el valor de k = x con validación cruzada y predigo con ese modelo
+	modelo_ac_test <- train(iris_train, iris_train_etiquetas, method = "knn", 
+						metric="Accuracy", tuneGrid = data.frame(.k=x),
+						trControl = trainControl(method = "cv", number = 10))
+	predict(modelo_ac_test, iris_test)
+})
 resultados_test <- sapply(resultados_test, function(x) {calcular_accuracy(iris_test_etiquetas, x)})
 resultados_test
 
-avance_test <- data.frame(k = 1:20, Accuracy = resultados_test)
+avance_accuracy <- data.frame(k = 1:20, Accuracy_test = resultados_test, Accuracy_train = modelo_knn$results$Accuracy)
 
 # mostramos avance de accuracy para train y test y guardamos los ficheros
-mostrar_avance_accuracy_k(modelo_knn$results, nombre_disco = "avance_accuracy_k_train")
-mostrar_avance_accuracy_k(avance_test, nombre_disco = "avance_accuracy_k_test")
+ggplot(avance_accuracy %>% pivot_longer(c(2, 3)), aes(x = k, y = value, color = name)) +
+	geom_line() +
+	geom_point() +
+	ggtitle("Accuracy del modelo en función del valor de K escogido") +
+	xlab("Valor de K") +
+	ylab("Accuracy")
+
+ggsave("out/iris/avance_accuracy_iris.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
 
 # predecimos con los datos de test
@@ -106,8 +107,9 @@ predicciones_test <- predict(modelo_knn, newdata = iris_test)
 matriz_confusion <- confusionMatrix(predicciones_test, iris_test_etiquetas)
 matriz_confusion
 
-plot_matriz_confusion(matriz_confusion)
+plot_matriz_confusion(matriz_confusion, "Modelo K-NN")
 
+ggsave("out/iris/matriz_confusion_knn.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
 
 
@@ -134,8 +136,6 @@ apply(iris %>% filter(as.integer(Class) == 3) %>% select_if(is.numeric), 2, shap
 
 # 3. Misma matriz de covarianza
 
-covariance <- c(var(iris$SepalLength), var(iris$SepalWidth), var(iris$PetalLength), var(iris$PetalWidth))
-covariance
 
 bartlett.test(SepalLength ~ Class, iris) # rechazamos hipotesis nula, no sigue la misma covarianza
 bartlett.test(SepalWidth ~ Class, iris)
@@ -146,7 +146,8 @@ bartlett.test(PetalLength ~ Class, iris) # rechazamos hipotesis nula, no sigue l
 bartlett.test(PetalWidth ~ Class, iris)
 
 # con LeveneTest se rechaza también H0, así que tampoco tiene la misma covarianza
-leveneTest(PetalWidth ~ Class, iris)
+# (con respecto al as.numeric, me da error si no lo uso, aunque ya es numerico, no se por que)
+leveneTest(as.numeric(PetalWidth) ~ Class, iris)
 
 # como vemos, debido a que PetalWidth no sigue una normal dentro de cada clase, y
 # que no tenemos la misma matriz de covarianza, no deberíamos aplicar LDA, o por 
@@ -158,6 +159,19 @@ lda_fit <- train(iris_train, iris_train_etiquetas,
 				trControl = trainControl(method = "cv", number = 10))
 
 lda_fit
+
+# predecimos con los datos de test
+predicciones_test_lda <- predict(lda_fit, newdata = iris_test)
+
+# miramos accuracy y kappa con la matriz de confusión
+matriz_confusion <- confusionMatrix(predicciones_test_lda, iris_test_etiquetas)
+matriz_confusion
+
+plot_matriz_confusion(matriz_confusion, "Modelo LDA")
+
+ggsave("out/iris/matriz_confusion_lda.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
+
 
 #
 # QDA
@@ -173,6 +187,17 @@ qda_fit <- train(iris_train, iris_train_etiquetas,
 qda_fit
 
 
+# predecimos con los datos de test
+predicciones_test_qda <- predict(qda_fit, newdata = iris_test)
+
+# miramos accuracy y kappa con la matriz de confusión
+matriz_confusion <- confusionMatrix(predicciones_test_qda, iris_test_etiquetas)
+matriz_confusion
+
+plot_matriz_confusion(matriz_confusion, "Modelo QDA")
+
+ggsave("out/iris/matriz_confusion_qda.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
 
 #
 # comparacion entre los tres modelos
@@ -180,6 +205,7 @@ qda_fit
 nombre <- "data/iris/iris"
 
 run_method_fold <- function(i, x, metodo) {
+	# leemos los datos
 	file <- paste(x, "-10-", i, "tra.dat", sep="")
 	x_tra <- read.csv(file, comment.char="@", header=FALSE)
 	file <- paste(x, "-10-", i, "tst.dat", sep="")
@@ -189,26 +215,29 @@ run_method_fold <- function(i, x, metodo) {
 	
 	names(x_tst) <- c("SepalLength", "SepalWidth", "PetalLength", "PetalWidth", "Class")
 	
+	# pasamos a factor la clas
 	x_tra$Class <- as.factor(x_tra$Class)
 	
 	x_tst$Class <- as.factor(x_tst$Class)
 	
+	# separamos los datos de las etiquetas
 	x_tra_labels <- x_tra[, 5]
 	x_tra <- x_tra[, -5]
 	
 	x_tst_labels <- x_tst[, 5]
 	x_tst <- x_tst[, -5]
 
+	# si es el knn, usamos el mejor k para entrenar	
 	if (metodo == "knn") {
 		modelo <- train(x_tra, x_tra_labels,
 					   method = metodo,
-					   tuneGrid = expand.grid(k = 9))
+					   tuneGrid = expand.grid(k = modelo_knn$bestTune$k))
 	} else {
 		modelo <- train(x_tra, x_tra_labels,
 					   method = metodo)
 	}
 	
-	
+	# predecimos y devolvemos el accuracy
 	yprime_train <- predict(modelo,x_tra)
 	yprime_test <- predict(modelo,x_tst)
 	# calculamos accuracy
@@ -276,5 +305,4 @@ test_friedman
 # como el test nos devuelve un pvalue muy alto, del 0.70, no rechazamos la hipotesis
 # nula, luego NO hay diferencias significativas entre los tres algoritmos
 # con los conjuntos de datos que hemos utilizado
-
 
