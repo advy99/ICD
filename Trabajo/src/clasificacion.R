@@ -225,3 +225,42 @@ resultados <- lapply(metodos, function(x) {
 })
 
 resultados
+
+# leemos y cambiamos los valores obtenidos en test
+tabla_resultados_test <- read.csv("data/clasif_test_alumnos.csv")
+tabla_resultados_test
+
+tabla_resultados_test[9, 2] <- resultados$knn$test
+tabla_resultados_test[9, 3] <- resultados$lda$test
+tabla_resultados_test[9, 4] <- resultados$qda$test
+
+tabla_resultados_test
+
+
+# lo mismo pero en train
+tabla_resultados_train <- read.csv("data/clasif_train_alumnos.csv")
+tabla_resultados_train
+
+tabla_resultados_train[9, 2] <- resultados$knn$train
+tabla_resultados_train[9, 3] <- resultados$lda$train
+tabla_resultados_train[9, 4] <- resultados$qda$train
+
+
+tabla_resultados_train
+
+# comparamos los tres algoritmos
+
+# sacamos la tabla de resultados
+tablatst <- cbind(tabla_resultados_test[,2:dim(tabla_resultados_test)[2]])
+colnames(tablatst) <- names(tabla_resultados_test)[2:dim(tabla_resultados_test)[2]]
+rownames(tablatst) <- tabla_resultados_test[,1]
+
+# se la pasamos al test de friedman
+test_friedman <- friedman.test(as.matrix(tablatst))
+test_friedman
+
+# como el test nos devuelve un pvalue muy alto, del 0.70, no rechazamos la hipotesis
+# nula, luego NO hay diferencias significativas entre los tres algoritmos
+# con los conjuntos de datos que hemos utilizado
+
+
