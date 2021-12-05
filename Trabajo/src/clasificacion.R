@@ -34,11 +34,15 @@ plot_matriz_confusion <- function(matriz){
 	grafico
 }
 
-mostrar_avance_accuracy_k <- function(resultados_caret) {
+mostrar_avance_accuracy_k <- function(resultados_caret, nombre_disco = "") {
 	ggplot(resultados_caret, aes(x = k, y = Accuracy)) +
 		geom_line() +
 		geom_point() +
 		ggtitle("Accuracy del modelo en función del valor de K escogido")
+	
+	if (nombre_disco != "") {
+		ggsave(paste("out/iris/", nombre_disco, ".svg", sep = ""), device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+	}
 }
 
 
@@ -83,7 +87,17 @@ modelo_knn <- train(iris_train, iris_train_etiquetas, method = "knn",
 # miramos el resultado, que nos dirá la mejor k
 modelo_knn
 
-mostrar_avance_accuracy_k(modelo_knn$results)
+# para ver el avance en test, entrenamos un knn con las distintas k y calculamos su accuracy en test
+resultados_test <- lapply(1:20, function(x) {knn(train = iris_train, test = iris_test, cl = iris_train_etiquetas, k = x)})
+resultados_test <- sapply(resultados_test, function(x) {calcular_accuracy(iris_test_etiquetas, x)})
+resultados_test
+
+avance_test <- data.frame(k = 1:20, Accuracy = resultados_test)
+
+# mostramos avance de accuracy para train y test y guardamos los ficheros
+mostrar_avance_accuracy_k(modelo_knn$results, nombre_disco = "avance_accuracy_k_train")
+mostrar_avance_accuracy_k(avance_test, nombre_disco = "avance_accuracy_k_test")
+
 
 # predecimos con los datos de test
 predicciones_test <- predict(modelo_knn, newdata = iris_test)
