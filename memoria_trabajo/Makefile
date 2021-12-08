@@ -5,7 +5,7 @@ OUT_NAME = $(strip $(OUT))$(strip $(basename $(TEX_FILE))).pdf
 .PHONY = all clean crear_carpetas
 
 TEXCC = pdflatex
-TEXCCFLAGS = -output-directory=$(OUT)
+TEXCCFLAGS = -output-directory=$(OUT) -shell-escape
 
 CARPETA_ENCONTRADA = $(wildcard $(OUT))
 
