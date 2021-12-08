@@ -6,7 +6,25 @@ En este primer apartado realizaremos el análisis de los datos. Este análisis i
 
 \subsubsection{Descripción del conjunto de datos}
 
+Este conjunto de datos contiene información sobre distintas estadísticas de jugadores de béisbol, como el número de veces que batean, el número de partidos que juegan, los errores, entre otras estadísticas, así como su salario, que será el valor de salida que intentamos predecir.
+
+Tras esta descripción del conjunto de datos, vamos a pasar a obtener distintas medidas de interés sobre los datos.
+
+
 \subsubsection{Medidas de interes}
+
+Lo primero a consultar de nuestro conjunto de datos es las dimensiones del mismo. Tras hacer uso del comando \texttt{dim}, vemos que el conjunto cuenta con 337 filas y 17 características (contando con la variable objetivo).
+
+Tras esto pasamos a consultar el tipo de las características de cara a comprobar que se han leído de forma correcta. El comando \texttt{str} nos devolverá esta información, y vemos como todas son de tipo entero, a excepción del porcentaje de bateo y el porcentaje que un jugador llega a una base, que son de tipo numérico al contar con decimales.
+
+Lo siguiente que comprobaremos, antes de consultar los propios valores de las variables será comprobar si existen valores perdidos. Para esto utilizaremos el comando \texttt{is.na} junto con el comando \texttt{any} para saber si se encuentra algún valor perdido. De forma gráfica también podemos utilizar el gráfico \texttt{missmap} del paquete Amelia:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/missmap_baseball}
+	\caption{Mapa de valores perdidos en el conjunto de datos baseball.}
+	\label{fig:missmap_iris}
+\end{figure}
 
 \subsubsection{Visualización gráfica del conjunto de datos}
 
