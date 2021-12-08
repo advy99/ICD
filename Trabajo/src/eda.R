@@ -89,7 +89,7 @@ summary(iris)
 par_default <- par(mar = c(0, 0, 0, 0))
 # miramos si tenemos valores perdidos
 # abrimos un dispositivo de salida en formato svg
-svg("out/iris/mismmap_iris.svg")
+svg("out/iris/missmap_iris.svg")
 missmap(iris)
 # lo cerramos al terminar de dibujar
 dev.off()
@@ -201,7 +201,7 @@ summary(baseball)
 # y luego el qqplot no se verá bien, así que los restauramos despues del missmap
 par_default <- par(mar = c(0, 0, 0, 0))
 # miramos si tenemos valores perdidos
-svg("out/baseball/mismmap_baseball.svg")
+svg("out/baseball/missmap_baseball.svg")
 missmap(baseball)
 dev.off()
 par(par_default)
