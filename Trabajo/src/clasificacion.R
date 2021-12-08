@@ -111,6 +111,19 @@ plot_matriz_confusion(matriz_confusion, "Modelo K-NN")
 
 ggsave("out/iris/matriz_confusion_knn.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
+iris_plot <- iris
+# le cambiamos las etiquetas a las predichas
+iris_plot[-muestras_train, "Class"] <- predicciones_test
+# marco las que he usado como test
+iris_plot["test"] <- 0
+iris_plot[-muestras_train, "test"] <- 1
+iris_plot$test <- as.factor(iris_plot$test) 
+str(iris_plot)
+
+ggplot(iris_plot, aes(x = PetalLength, y = PetalWidth, color = Class, shape = test)) +
+	geom_point(size = 5) + 
+	labs(title = "Predicciones utilizando KNN")
+ggsave("out/iris/predicciones_knn.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
 
 
@@ -172,6 +185,20 @@ plot_matriz_confusion(matriz_confusion, "Modelo LDA")
 ggsave("out/iris/matriz_confusion_lda.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
 
+iris_plot <- iris
+# le cambiamos las etiquetas a las predichas
+iris_plot[-muestras_train, "Class"] <- predicciones_test_lda
+# marco las que he usado como test
+iris_plot["test"] <- 0
+iris_plot[-muestras_train, "test"] <- 1
+iris_plot$test <- as.factor(iris_plot$test) 
+str(iris_plot)
+
+ggplot(iris_plot, aes(x = PetalLength, y = PetalWidth, color = Class, shape = test)) +
+	geom_point(size = 5) + 
+	labs(title = "Predicciones utilizando LDA")
+ggsave("out/iris/predicciones_lda.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
 
 #
 # QDA
@@ -197,6 +224,22 @@ matriz_confusion
 plot_matriz_confusion(matriz_confusion, "Modelo QDA")
 
 ggsave("out/iris/matriz_confusion_qda.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
+iris_plot <- iris
+# le cambiamos las etiquetas a las predichas
+iris_plot[-muestras_train, "Class"] <- predicciones_test_qda
+# marco las que he usado como test
+iris_plot["test"] <- 0
+iris_plot[-muestras_train, "test"] <- 1
+iris_plot$test <- as.factor(iris_plot$test) 
+str(iris_plot)
+
+ggplot(iris_plot, aes(x = PetalLength, y = PetalWidth, color = Class, shape = test)) +
+	geom_point(size = 5) + 
+	labs(title = "Predicciones utilizando QDA")
+ggsave("out/iris/predicciones_qda.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
+
 
 
 #
