@@ -84,7 +84,6 @@ lapply(fit_lm_baseball, function (fit) {
 	par(mfrow=c(1,1))
 })
 
-
 #
 # Regresión lineal multiple
 #
@@ -371,6 +370,17 @@ calcular_RMSE(baseball$Salary, predict(fit_lm_multiple_no_linealidad, baseball))
 # y de un adjusted R-squared de 0.7367 a uno de 0.7501, mejoras bastante significativas
 
 
+# predecimos las del mejor modelo
+predicciones_train <- predict(fit_lm_multiple_no_linealidad, baseball)
+
+ggplot(baseball %>% mutate(Salary_predicho = predicciones_train) %>% pivot_longer(Salary:Salary_predicho), aes(x = Runs_batted_in, y = value, color = name)) +
+	geom_point() + 
+	labs(title = "Predicciones utilizando el modelo lineal\n múltiple con interacciones y no linealidad",
+		 subtitle = "Utilizando característica con mayor correlación con el salario.") +
+	ylab("Salary")
+ggsave("out/baseball/predicciones_lm_completo.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
+
 #
 # KNN
 #
@@ -394,6 +404,16 @@ calcular_MSE(baseball$Salary, fit_knn_mejor_lm$fitted.values)
 calcular_RMSE(baseball$Salary, fit_knn_mejor_lm$fitted.values)
 
 # como vemos la opción con la formula de lm es algo mejor, pero tampoco mucho
+
+
+ggplot(baseball %>% mutate(Salary_predicho = fit_knn_mejor_lm$fitted.values) %>% pivot_longer(Salary:Salary_predicho), aes(x = Runs_batted_in, y = value, color = name)) +
+	geom_point() + 
+	labs(title = "Predicciones utilizando KNN",
+		 subtitle = "Utilizando característica con mayor correlación con el salario.") +
+	ylab("Salary")
+ggsave("out/baseball/predicciones_knn.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
+
 
 nombre <- "data/baseball/baseball"
 
