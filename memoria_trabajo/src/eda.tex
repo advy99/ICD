@@ -370,6 +370,8 @@ En esta sección, debido que el problema se basa en ser capaces de distinguir en
 	\label{fig:boxplot_iris_SepalWidth}
 \end{figure}
 
+Con respecto a SepalWidth podemos encontrar dos valores anómalos utilizando el método IQR en la clase Virginica, además de un gran solape entre las tres clases, por lo que podemos intuir que no será un buen predictor.
+
 
 \begin{figure}[H]
 	\centering
@@ -377,6 +379,8 @@ En esta sección, debido que el problema se basa en ser capaces de distinguir en
 	\caption{Boxplot para el predictor SepalLength de iris.}
 	\label{fig:boxplot_iris_SepalLength}
 \end{figure}
+
+Al igual que con la característica anterior, con SepalLength también existe un alto solapamiento, aunque algo mejor, y volvemos a encontrar una anomalía en la clase Virginica.
 
 
 \begin{figure}[H]
@@ -386,6 +390,7 @@ En esta sección, debido que el problema se basa en ser capaces de distinguir en
 	\label{fig:boxplot_iris_PetalWidth}
 \end{figure}
 
+En este caso, utilizando PetalWidth, en la clase Setosa no existe ningún solapamiento, estando todos los valores concentrados entre cero y un medio, aunque si existe cierto solapamiento aunque no muy alto entre las otras dos variables, con lo que podemos intuir que esta variable nos dará bastante información a la hora de predecir la clase.
 
 \begin{figure}[H]
 	\centering
@@ -394,8 +399,9 @@ En esta sección, debido que el problema se basa en ser capaces de distinguir en
 	\label{fig:boxplot_iris_PetalLength}
 \end{figure}
 
+Al igual que PetalWidth, PetalLength también nos servierá para predecir la clase Setosa, estando sus valores muy concentrados en valores entre uno y dos.
 
-Y con esto pasamos a los gráficos de densidad:
+Y con esto, de cara a comprobar las distribuciones que sigue cada predictor y comprobar las hipótesis realizadas con los boxplots, pasamos a los gráficos de densidad:
 
 \begin{figure}[H]
 	\centering
