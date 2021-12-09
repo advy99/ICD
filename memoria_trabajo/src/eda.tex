@@ -11,7 +11,7 @@ Este conjunto de datos contiene información sobre distintas estadísticas de ju
 Tras esta descripción del conjunto de datos, vamos a pasar a obtener distintas medidas de interés sobre los datos.
 
 
-\subsubsection{Medidas de interes}
+\subsubsection{Medidas de interés}
 
 Lo primero a consultar de nuestro conjunto de datos es las dimensiones del mismo. Tras hacer uso del comando \texttt{dim}, vemos que el conjunto cuenta con 337 filas y 17 características (contando con la variable objetivo).
 
@@ -23,12 +23,101 @@ Lo siguiente que comprobaremos, antes de consultar los propios valores de las va
 	\centering
 	\includesvg[width = 400pt]{baseball/missmap_baseball}
 	\caption{Mapa de valores perdidos en el conjunto de datos baseball.}
-	\label{fig:missmap_iris}
+	\label{fig:missmap_baseball}
 \end{figure}
+
+Como vemos, este conjunto de datos no cuenta con valores perdidos, por lo que con esto pasamos a calcular las medidas de interés de cada predictor.
+
+
+De cara a conocer el comportamiento de las características se han calculado los siguientes valores de interés para cada predictor:
+
+\begin{itemize}
+	\item Media
+	\item Desviación estándar
+	\item Mínimo
+	\item Máximo
+	\item Cuartiles
+\end{itemize}
+
+
+Estos valores los podemos consultar en el código en R adjunto, y aquí me comentaré la información más interesante que se ha obtenido.
+
+Para empezar, observando los mínimos, máximos y cuartiles de las característica podemos ver que cuatro de los predictores, Free agency eligibility, Free agent, Arbitration eligibility y Arbitration, se han leído como valores numéricos del fichero de datos aunque se tratan de variables lógicas que solo toman dos valores, cero o uno.
+
+Otro dato de interés con respecto a la variable de salida es que la media y la mediana son muy distintas, siendo la mediana casi la mitad del salario medio, sumado al gran valor de la desviación estándar del salario, podemos intuir que la mayoría de jugadores cobran un salario mucho menor que el salario máximo.
 
 \subsubsection{Visualización gráfica del conjunto de datos}
 
-\subsubsection{Conclusiones obtenidas a partir del análisis}
+Tras este primer vistazo a los datos y sus valores de interés, pasamos a representarlos de forma gráfica los datos.
+
+Para empezar se ha realizado una gráfica general de los datos utilizando el comando \texttt{ggpairs}:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{baseball/vista_general_baseball}
+	\caption{Vista general del conjunto de datos baseball.}
+	\label{fig:vista_general_baseball}
+\end{figure}
+
+Aunque esta gráfica es muy difícil de leer ya que tenemos una gran cantidad de características, nos da una primera idea de que relaciones existen entre las variables así como su distribución.
+
+Para ver más en detalle los valores que toma cada variable vamos ver un boxplot de cada una:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{baseball/boxplot_baseball}
+	\caption{Boxplot de cada variable de baseball. \textbf{AVISO}: Mirar cada gráfica de forma independiente, la escala está libre.}
+	\label{fig:boxplot_baseball}
+\end{figure}
+
+Se ha decidido poner la escala libre para evitar que una variable con valores muy amplios no nos deje ver los valores de las demás, por lo que hay que estudiar cada gráfica por separado y no realizar comparativas de estos gráficos sin tener en cuenta los ejes individuales de cada gráfica.
+
+Con este gráfico podemos obtener bastante información sobre las variables. Para empezar, podemos observar que muchas de estas tienen valores anómalos según el método IQR, que aunque en principio en esta asignatura no trabajemos anomalías es algo que tenemos que tener en cuenta al usar estos predictores en nuestros modelos. También podemos ver que en ciertas variables como Batting average y On base percentage la mayoría de valores se concentran en un rango muy pequeño de valores, teniendo la mitad de valores entre el $0.24$ y el $0.3$ y entre $0.3$ y $0.36$ respectivamente, siendo ambas variables que expresan un porcentaje entre cero y uno. Otra variable a la que le ocurre lo mismo es a Stolen bases, donde la mitad de sus datos están entre el 0 y el 16, contando con bastantes valores anómalos.
+
+Otra información a destacar de este gráfico son los cuatro boxplot de la esquina superior izquierda, Arbitration, Arbitration eligibility, Free agent eligibility y Free agent, que como vemos solo toman valores cero y uno, de ahí esas formas tan peculiares en los boxplots.
+
+
+También se ha observado el gráfico de densidad de las características, de cara a observar la forma de la distribución en los datos:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/densidad_baseball}
+	\caption{Gráfico de densidad de cada variable de baseball. \textbf{AVISO}: Mirar cada gráfica de forma independiente, la escala está libre.}
+	\label{fig:densidad_baseball}
+\end{figure}
+
+Rápidamente podemos ver que tenemos una gran variedad de distribuciones. Como era de esperar, en las variables lógicas encontramos una distribución bimodal, aunque con este gráfico podemos ver que, a excepción de Free agency eligibility, en las otras tres variables predomina el valor cero.
+
+Visualmente podemos ver que la que más se acerca a una distribución normal es Batting average, aunque tiene algunos valores en la cola izquierda que nos pueden hacer dudar si finalmente seguirá una normal.
+
+Para ver esto más claramente, utilizaremos los gráficos Q-Q:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/qqplot_todos_baseball}
+	\caption{Gráfico de normalidad Q-Q de cada variable de baseball.}
+	\label{fig:qqplot_todos_baseball}
+\end{figure}
+
+En este gráfico podemos ver como, de nuevo, la más parecida a una normal es Batting average, aunque vemos como en las colas (en especial en la izquierda) observamos datos que no están sobre la linea.
+
+De cara a comprobar estadisticamente si alguna de estas distribuciones es una distribución normal se ha aplicado el test de normalidad de Shapiro-Wilk, con el que no se ha podido rechazar la hipótesis nula para ninguna de las variables, luego no podemos concluir que sigan una distribución normal.
+
+
+Finalmente, de cara a observar las relaciones entre las variables y si existe alguna correlación con la de salida se ha realizado un gráfico de la matriz de correlación:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/matriz_correlaciones_baseball}
+	\caption{Matriz de correlaciones entre las variables de baseball.}
+	\label{fig:matriz_correlaciones_baseball}
+\end{figure}
+
+De este gráfico podemos observar que existe un grupo de predictores altamente relacionados entre sí, Runs, Hits, Doubles y Runs batted in, por lo que se podría estudiar eliminar alguno de estos predictores para obtener un modelo más simple. También podemos observar que este grupo de predictores tiene una relación relativamente alta con la variable a predecir.
+
+También existen otras variables que están correladas, como Batting average y On base percentaje, ya que tiene sentido que si un jugador batea más, tenga más probabilidad de llegar a una base, o entre On base percentage y Walks por el mismo motivo.
+
+\subsubsection{Conclusiones e hipótesis a partir del análisis}
 
 
 
@@ -36,8 +125,23 @@ Lo siguiente que comprobaremos, antes de consultar los propios valores de las va
 
 \subsubsection{Descripción del conjunto de datos}
 
-\subsubsection{Medidas de interes}
+\subsubsection{Medidas de interés}
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/missmap_baseball}
+	\caption{Mapa de valores perdidos en el conjunto de datos baseball.}
+	\label{fig:missmap_baseball}
+\end{figure}
+
 
 \subsubsection{Visualización gráfica del conjunto de datos}
 
-\subsubsection{Conclusiones obtenidas a partir del análisis}
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{baseball/vista_general_baseball}
+	\caption{Vista general del conjunto de datos baseball.}
+	\label{fig:vista_general_baseball}
+\end{figure}
+
+\subsubsection{Conclusiones e hipótesis a partir del análisis}
