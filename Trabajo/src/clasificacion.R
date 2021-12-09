@@ -144,7 +144,7 @@ apply(iris %>% filter(as.integer(Class) == 1) %>% select_if(is.numeric), 2, shap
 apply(iris %>% filter(as.integer(Class) == 2) %>% select_if(is.numeric), 2, shapiro.test)
 apply(iris %>% filter(as.integer(Class) == 3) %>% select_if(is.numeric), 2, shapiro.test)
 
-# como vemos, a excepción del último predictor, las demás si siguen una normal
+# como vemos, a excepción del último predictor, no podemos rechazar que siga una distribución normal
 # para las tres etiquetas que tenemos
 
 # 3. Misma matriz de covarianza
