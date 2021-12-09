@@ -113,6 +113,8 @@ medidas_iris <- lapply(medidas, function(funcion_medida) {
 								} )
 medidas_iris
 
+cuartiles_iris <- apply(iris[,-5], 2, quantile)
+cuartiles_iris
 
 # graficamos los datos
 
@@ -223,6 +225,9 @@ medidas_baseball <- lapply(medidas, function(funcion_medida) {
 	apply(baseball, 2, funcion_medida)
 } )
 medidas_baseball
+
+cuartiles_baseball <- apply(baseball, 2, quantile)
+cuartiles_baseball
 
 
 # graficamos los datos
