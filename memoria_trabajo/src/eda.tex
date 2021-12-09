@@ -172,3 +172,104 @@ Para comenzar, también realizaremos una gráfica más general para ver de una m
 	\caption{Vista general del conjunto de datos iris.}
 	\label{fig:vista_general_iris}
 \end{figure}
+
+
+Con este gráfico podemos comenzar a obtener información bastante interesante, aun así voy a utilizar los gráficos completos para mostrar una mejor visualización, comenzando por el número de observaciones para cada clase, ya que esto es muy importante en un problema de clasificación:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{iris/recuento_clases_iris}
+	\caption{Número de observaciones de cada clase para el conjunto de datos iris.}
+	\label{fig:recuento_clases_iris}
+\end{figure}
+
+Como vemos, en este caso las clases están balanceadas, es decir, tenemos el mismo número de observaciones para cada clase, lo que ayudará a evitar que se sobreaprendan algunas clases, o que no tengamos suficientes muestras como para aprender una clase.
+
+En esta sección, debido que el problema se basa en ser capaces de distinguir entre las clases en los gráficos distinguiremos las clases del problema. Vamos a empezar con los boxplot para ver como están distribuidos los valores de cada predictor:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/boxplot_iris_SepalWidth}
+	\caption{Boxplot para el predictor SepalWidth de iris.}
+	\label{fig:boxplot_iris_SepalWidth}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/boxplot_iris_SepalLength}
+	\caption{Boxplot para el predictor SepalLength de iris.}
+	\label{fig:densidad_iris_SepalLength}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/boxplot_iris_PetalWidth}
+	\caption{Boxplot para el predictor PetalWidth de iris.}
+	\label{fig:boxplot_iris_PetalWidth}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/boxplot_iris_PetalLength}
+	\caption{Boxplot para el predictor PetalLength de iris.}
+	\label{fig:boxplot_iris_PetalLength}
+\end{figure}
+
+
+Y con esto pasamos a los gráficos de densidad:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/densidad_iris_SepalWidth}
+	\caption{Gráfico de densidad para el predictor SepalWidth de iris.}
+	\label{fig:densidad_iris_SepalWidth}
+\end{figure}
+
+Con este primer gráfico de densidad, del predictor SepalWidth, podemos ver que este predictor no será capaz de realizar una buena distinción entre las clases, ya que se solapan todas en gran medida, aunque es cierto que se pueden observar ciertas diferencias con la clase Setosa.
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/densidad_iris_SepalLength}
+	\caption{Gráfico de densidad para el predictor SepalLength de iris.}
+	\label{fig:densidad_iris_SepalLength}
+\end{figure}
+
+La variable SepalWidth es capaz de distinguir de mejor forma las clases, en especial Setosa, aunque sigue existiendo un gran solape entre Versicolor y Virginica.
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/densidad_iris_PetalWidth}
+	\caption{Gráfico de densidad para el predictor PetalWidth de iris.}
+	\label{fig:densidad_iris_PetalWidth}
+\end{figure}
+
+En este caso podemos ver como con PetalWidth podemos hacer una distinción perfecta entre Setosa y el resto de clases, además de reducir en gran cantidad el solape entre Versicolor y Virginica.
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/densidad_iris_PetalLength}
+	\caption{Gráfico de densidad para el predictor PetalLength de iris.}
+	\label{fig:densidad_iris_PetalLength}
+\end{figure}
+
+Por último, con PetalLength también se puede hacer una distinción perfecta entre Setosa y el resto de clases, aunque sigue existiendo un solape entre Versicolor y Virginica.
+
+Con estos cuatro gráficos vemos que podemos esperar distinguir las observaciones de Setosa con el resto sin ningún problema gracias a las medidas del pétalo, haciendo que los errores se encuentren en las clases Versicolor y Virginica, aunque este error no será muy alto ya que también gracias a las medidas del pétalo el solape es menor, y posiblemente con toda la información en conjunto se consiga distinguir todavía mejor ese solape que vemos ahora.
+
+
+Tras estos gráficos de densidad, pasamos a observar si los predictores siguen una distribución normal, para esto se ha usado de nuevo el gráfico Q-Q, además del test estadístico de Shapiro-Wilk:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/qqplot_iris}
+	\caption{Gráfico de normalidad Q-Q de cada variable de iris.}
+	\label{fig:qqplot_iris}
+\end{figure}
+
+
+Podemos ver que gráficamente la que más se acerca a una distribución normal es SepalWidth, aunque los valores en la cola derecha nos dan a intuir que no será así.
+
+Tras lanzar el test de normalidad de Shapiro-Wilk rechazamos la hipótesis nula de que sigue una distribución normal para todos los predictores a excepción de para SepalWidth con un nivel de confianza del 95\%, aunque cabe mencionar que SepalWidth no se rechaza la hipótesis por muy poco, seguramente debido a esos valores extraños que vimos en la cola derecha del gráfico Q-Q.
