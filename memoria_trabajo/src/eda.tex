@@ -103,7 +103,6 @@ En este gráfico podemos ver como, de nuevo, la más parecida a una normal es Ba
 
 De cara a comprobar estadisticamente si alguna de estas distribuciones es una distribución normal se ha aplicado el test de normalidad de Shapiro-Wilk, con el que no se ha podido rechazar la hipótesis nula para ninguna de las variables, luego no podemos concluir que sigan una distribución normal.
 
-
 Finalmente, de cara a observar las relaciones entre las variables y si existe alguna correlación con la de salida se ha realizado un gráfico de la matriz de correlación:
 
 \begin{figure}[H]
@@ -117,31 +116,59 @@ De este gráfico podemos observar que existe un grupo de predictores altamente r
 
 También existen otras variables que están correladas, como Batting average y On base percentaje, ya que tiene sentido que si un jugador batea más, tenga más probabilidad de llegar a una base, o entre On base percentage y Walks por el mismo motivo.
 
-\subsubsection{Conclusiones e hipótesis a partir del análisis}
-
-
 
 \subsection{Conjunto de datos para clasificación: iris}
 
 \subsubsection{Descripción del conjunto de datos}
 
+Este conjunto contiene información sobre las medidas del pétalo y sépalo de tres tipos distintos de la flor Iris. Nos proporciona tanto la longitud como el ancho del pétalo y sépalo de estas tres clases:
+
+\begin{itemize}
+	\item Versicolor
+	\item Virginica
+	\item Setosa
+\end{itemize}
+
 \subsubsection{Medidas de interés}
+
+Lo primero a consultar de nuestro conjunto de datos es las dimensiones del mismo. Tras hacer uso del comando \texttt{dim}, vemos que el conjunto cuenta con 150 filas y 5 características (contando con la clase a predecir).
+
+Tras esto pasamos a consultar el tipo de las características de cara a comprobar que se han leído de forma correcta. El comando \texttt{str} nos devolverá esta información, y vemos como todas a excepción de la clase son de tipo numérico al contar con decimales. La clase a la que pertenecen le ha asignado el tipo carácter, sin embargo lo vamos a transformar a factor con el comando \texttt{as.factor} ya que se tratan de tres niveles sin orden distintos, las tres clases a clasificar.
+
+Al igual que con el conjunto de regresión, antes de consultar los propios valores de las variables será comprobar si existen valores perdidos. Para esto utilizaremos el comando \texttt{is.na} junto con el comando \texttt{any} para saber si se encuentra algún valor perdido. De forma gráfica también podemos utilizar el gráfico \texttt{missmap} del paquete Amelia:
+
 
 \begin{figure}[H]
 	\centering
-	\includesvg[width = 400pt]{baseball/missmap_baseball}
-	\caption{Mapa de valores perdidos en el conjunto de datos baseball.}
-	\label{fig:missmap_baseball}
+	\includesvg[width = 400pt]{iris/missmap_iris}
+	\caption{Mapa de valores perdidos en el conjunto de datos iris.}
+	\label{fig:missmap_iris}
 \end{figure}
 
+Como podemos ver, en este conjunto de datos tampoco existen valores perdidos.
+
+Como en regresión, se han calculado los siguientes valores de interés para cada predictor (a excepción de la clase ya que no es de tipo numérico):
+
+\begin{itemize}
+	\item Media
+	\item Desviación estándar
+	\item Mínimo
+	\item Máximo
+	\item Cuartiles
+\end{itemize}
+
+
+Estos valores los podemos consultar en el código en R adjunto, y aquí me comentaré la información más interesante que se ha obtenido.
+
+Como podemos ver con los máximos y mínimos, todos los valores están en un rango similar de valores. Con estos valores vemos que son relativamente normales, en los que se asemeja la media con la mediana, aunque es cierto que podemos ver que para la variable PetalLength la desviación típica es más alta que para las demás.
 
 \subsubsection{Visualización gráfica del conjunto de datos}
 
+Para comenzar, también realizaremos una gráfica más general para ver de una manera más rápida el conjunto de datos iris:
+
 \begin{figure}[H]
 	\centering
-	\includesvg[width = 500pt]{baseball/vista_general_baseball}
-	\caption{Vista general del conjunto de datos baseball.}
-	\label{fig:vista_general_baseball}
+	\includesvg[width = 500pt]{iris/vista_general_iris}
+	\caption{Vista general del conjunto de datos iris.}
+	\label{fig:vista_general_iris}
 \end{figure}
-
-\subsubsection{Conclusiones e hipótesis a partir del análisis}
