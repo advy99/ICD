@@ -256,13 +256,10 @@ ggplot(baseball %>% gather(), aes(x = value)) +
 	facet_wrap(~key, scales = "free")
 ggsave("out/baseball/boxplot_baseball.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
-
 ggplot(baseball %>% gather, aes(x = value)) +
 	geom_density(alpha = 0.5, fill = "red") +
 	facet_wrap(~key, scales = "free")
 ggsave("out/baseball/densidad_baseball.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
-
-
 
 # tenemos 17 variables, hacemos primero 9 y luego las 8 restantes
 par(mfrow=c(3,3))
@@ -469,7 +466,6 @@ library(ggplot2)
 library(corrplot)
 library(GGally)
 
-
 #
 # Funciones
 #
@@ -612,15 +608,11 @@ par(mfrow=c(2,2))
 lapply(colnames(iris[,-5]), function(col_name) { mostrar_grafico_qq(iris[,col_name], col_name, save_plot = TRUE) } )
 par(mfrow=c(1,1))
 
-
-
 # test de normalidad sobre las características, separado por cada clase
 apply(iris %>% select_if(is.numeric), 2, shapiro.test)
 
-
 # como podemos ver en los p-value, rechazamos la hipotesis nula de que los datos siguen
 # una distribución normal a excepción de la segunda característica, SepalWidth ,por muy poco
-
 
 matriz_correlaciones_iris <- cor(iris[, -5])
 matriz_correlaciones_iris
@@ -629,3 +621,5 @@ svg("out/iris/matriz_correlaciones_iris.svg")
 corrplot(matriz_correlaciones_iris, method = "ellipse")
 dev.off()
 \end{lstlisting}
+
+\newpage
