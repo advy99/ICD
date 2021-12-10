@@ -178,7 +178,28 @@ De cara a observar como son las predicciones que realiza, se ha realizado el sig
 	\label{fig:predicciones_lm_completo}
 \end{figure}
 
+Como vemos, la nube de puntos obtenida se asemeja bastante a la nube de puntos real.
+
+\newpage
+
 \subsection{K-NN}
+
+K-NN para regresión se basa en, para un punto en el espacio donde tenemos que predecir un valor, utilizar como predicción la media de los valores de los K vecinos más cercanos. De cara a buscar los vecinos más cercanos se pueden utilizar distintas medidas de distancia, aunque la más común será la distancia euclidea, la cual utilizaremos en esta sección.
+
+Debido a que se calcularán distancias, es necesario normalizar los datos antes de aplicar el algoritmo. En este caso se ha utilizado la función \texttt{kknn}, que ya incorpora el escalado de datos al crear el modelo. Con respecto a los parámetros a utilizar, se ha mantenido el valor de k por defecto así como el parámetro kernel, el cuál se buscará el óptimo automaticamente, tal y como vimos en clase.
+
+\subsubsection{Modelos utilizados}
+
+De cara a probar K-NN se ha probado con un modelo donde se incluyen todos los predictores así como la fórmula obtenida en el mejor modelo de regresión lineal. En este caso ha funcionado mejor el segundo modelo, en el que se ha obtenido un MSE de 189463.2, reduciendo en la mitad el obtenido por regresión lineal múltiple.
+
+Al igual que con el modelo de regresión lineal múltiple, se ha realizado un gráfico con las predicciones del modelo:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{baseball/predicciones_knn}
+	\caption{Predicciones realizadas por el modelo K-NN.}
+	\label{fig:predicciones_knn}
+\end{figure}
 
 \subsection{Comparación entre algoritmos}
 
