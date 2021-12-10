@@ -1,10 +1,56 @@
 \section{Clasificación}
 
+En esta sección aplicaremos tres métodos de clasificación al conjunto de datos iris, así como realizar una comparativa entre estos tres métodos. Los métodos serán los siguientes:
+
+\begin{itemize}
+	\item K-NN
+	\item LDA
+	\item QDA
+\end{itemize}
+
 \subsection{K-NN}
+
+K-NN para clasificación se basa en, para un punto en el espacio donde tenemos que predecir un valor, utilizar como predicción la etiqueta mayoritaria de los K vecinos más cercanos. De cara a buscar los vecinos más cercanos se pueden utilizar distintas medidas de distancia, aunque la más común será la distancia euclidea, la cual utilizaremos en esta sección.
+
+Debido a que se calcularán distancias es necesario normalizar los datos antes de aplicar el algoritmo, esto es importante ya que si no las variables cuyos valores sean mayores tendrán más peso a la hora de escoger los vecinos, de ahí la importancia de esta normalización. En nuestro caso se ha utilizado la normalización por Z-score, dejando la media de todos predictores en cero y la desviación estándar en uno.
+
+De cara al entrenamiento se ha separado en un conjunto de entrenamiento y otro de test, siendo el conjunto de test un 20\% de las observaciones obtenidas de forma aleatoria con una distribución uniforme sobre el conjunto de datos. Para realizar el entrenamiento se ha utilizado la función \texttt{train} del paqete \texttt{caret}, ya que nos permite hacer una búsqueda de hiperparámetros y aplicar validación cruzada de una forma muy sencilla.
 
 \subsubsection{Elección del parámetro k}
 
+De cara a obtener el mejor valor posible del parámetro k, el número de vecinos más cercanos que se tendrá en cuenta para realizar la estimación, se ha utilizado el parámetro \texttt{tuneGrid} de \texttt{train}. Se han probado valores de k entre 1 y 20, con especial mención a que he decidido utilizar valores pares para el valor de k ya que caret resuelve los empates que se pueden generar, y en nuestro problema, al tener tres clases, incluso con algunos valores impares se podría dar un empate que con un k de valor par no.
+
+Para el entrenamiento del modelo se ha utilizado el conjunto de entrenamiento con validación cruzada de diez particiones, y además se ha calculado la precisión en test para los distintos valores de k para comparar el comportamiento entre entrenamiento y test y así poder comentar sus principales diferencias. Se ha obtenido el siguiente resultado:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/avance_accuracy_iris}
+	\caption{Precisión en el conjunto de iris con K-NN para distintos valores de k.}
+	\label{fig:avance_accuracy_iris}
+\end{figure}
+
+Como podemos ver, este conjunto de datos es muy simple y se obtienen muy buenos resultados, llegando a tener valores de precisión muy alto, siempre por encima el 95\% de acierto en test. Vemos como en entrenamiento con validación cruzada se obtienen los mejores resultados con un k de cinco o seis, y ya que a la hora de escoger el valor de k solo disponemos de la información en el conjunto de entrenamiento, estos son los mejores valores y por lo tanto el valor final que se escogerá de k.
+
 \subsubsection{Resultados}
+
+Tras escoger el mejor valor se han realizado las predicciones en el conjunto de test para ver como es el comportamiento del modelo para datos que no ha observado, obteniendo la siguiente matriz de confusión:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/matriz_confusion_knn}
+	\caption{Matriz de confusión del conjunto de test tras aplicar K-NN.}
+	\label{fig:matriz_confusion_knn}
+\end{figure}
+
+Como vemos, no se ha equivocado en ningún valor del conjunto de test, por lo que el modelo no ha sobreaprendido. También se ha realizado un gráfico para observar como se ha comportado utilizando al clasificar, mostrando las dimensiones del pétalo ya que estos predictores eran los que menor solapamiento mostraban entre las clases como vimos en el análisis exploratorio de datos:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/predicciones_knn_iris}
+	\label{fig:predicciones_knn}
+\end{figure}
+
+Como vemos, el obtener un 100\% de precisión también se puede explicar con que se ha tenido bastante suerte al escoger el conjunto de test, y no hay muchos datos por la zona donde se solapan las dos clases problemáticas, Versicolor y Virginica.
 
 \subsection{LDA}
 
