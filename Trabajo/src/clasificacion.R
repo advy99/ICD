@@ -346,6 +346,6 @@ test_friedman <- friedman.test(as.matrix(tablatst))
 test_friedman
 
 # como el test nos devuelve un pvalue muy alto, del 0.70, no rechazamos la hipotesis
-# nula, luego NO hay diferencias significativas entre los tres algoritmos
+# nula, luego NO hay diferencias significativas entre ningun par de algoritmos
 # con los conjuntos de datos que hemos utilizado
 
