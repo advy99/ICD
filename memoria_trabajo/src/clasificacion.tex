@@ -54,9 +54,63 @@ Como vemos, el obtener un 100\% de precisión también se puede explicar con que
 
 \subsection{LDA}
 
+LDA se basa en transformar el espacio donde se encuentran los datos a un nuevo espacio con menor dimensionalidad pero mayor separabilidad entre los datos, de forma que la clasificación sea mucho más sencilla. Para que esto funcione LDA tiene algunas asunciones sobre el conjunto de datos sobre el que trabaja:
+
+\begin{enumerate}
+	\item Las observaciones se han obtenido de forma aleatoria.
+	\item Los datos de cada clase siguen una distribución normal.
+	\item Todas las clases tienen la misma matriz de covarianza.
+\end{enumerate}
+
+Sabiendo como funciona LDA, y que nuestro conjunto de datos ya es bastante separable para una clase, y con respecto a las otras dos existen predictores con poco solapamiento, cabe esperar que este método se comporte muy bien.
+
+Además, debido a que se va a cambiar el espacio donde se encuentran los datos, es recomendable normalizar el conjunto de datos, por lo que en este caso también normalizaremos el dataset iris.
+
+Para empezar, vamos a comprobar si cumplimos las asunciones necesarias para aplicar LDA.
+
 \subsubsection{Comprobación de las asunciones de LDA}
 
-\subsubsection{Resultados}
+Para empezar, con respecto a la primera asunción debemos suponer que así ha sido ya que nosotros no hemos generado el conjunto de datos, se nos ha dado.
+
+Para la segunda asunción, aplicaremos el test de Shapiro-Wilk a cada variable, separando los datos por clase. Aunque en la sección con el código de R se puede consultar el código comentado, estas son las instrucciones que realizan esta operación:
+
+\begin{lstlisting}
+apply(iris %>% filter(as.integer(Class) == 1) %>% select_if(is.numeric), 2, shapiro.test)
+apply(iris %>% filter(as.integer(Class) == 2) %>% select_if(is.numeric), 2, shapiro.test)
+apply(iris %>% filter(as.integer(Class) == 3) %>% select_if(is.numeric), 2, shapiro.test)
+\end{lstlisting}
+
+Podemos ver como a excepción del último predictor, PetalLength, en los demás no podemos rechazar que no se sigue una distribución normal.
+
+Aunque ya podemos ver que no se cumple la segunda asunción, vamos a continuar ya que se trata de un conjunto de datos muy simple y seguramente obtengamos unos buenos resultados aunque no se cumplan.
+
+
+De cara a comprobar la última asunción, que todas las clases tengan la misma matriz de covarianza, se ha utilizado el test de Bartlett para los predictores que siguen una distribución normal y el test de Levene para los que no siguen una distribución normal, debido a que aunque el test de Bartlett tiene más potencia estadística, necesita que los datos sigan una distribución normal.
+
+Tras lanzar los test vemos que rechazamos la hipotesis nula de que tenga la misma matriz de covarianza para todos los predictores menos para SepalWidth, por lo que LDA no tendría por qué dar buenos resultados.
+
+\subsubsection{Ejecución y resultados}
+
+Para realizar la ejecución se ha vuelto a usar caret para aplicar también una validación cruzada de diez folds.
+
+Tras entrenar el modelo vemos como obtiene un 97\% de accuracy en validación cruzada y un 100\% en el conjunto de test:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/matriz_confusion_lda}
+	\caption{Matriz de confusión del conjunto de test tras aplicar LDA.}
+	\label{fig:matriz_confusion_lda}
+\end{figure}
+
+Al igual que con K-NN, LDA tampoco ha tenido problemas para clasificar los datos del conjunto de test de forma correcta. También se ha visualizado en el espacio con respecto a los predictores del pétalo:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/predicciones_lda}
+	\label{fig:predicciones_lda}
+\end{figure}
+
+Y como era de esperar al utilizar el mismo conjunto de test y tener una precisión del 100\%, obtenemos el mismo resultado que con K-NN.
 
 \subsection{QDA}
 
