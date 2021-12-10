@@ -52,6 +52,8 @@ Como vemos, no se ha equivocado en ningún valor del conjunto de test, por lo qu
 
 Como vemos, el obtener un 100\% de precisión también se puede explicar con que se ha tenido bastante suerte al escoger el conjunto de test, y no hay muchos datos por la zona donde se solapan las dos clases problemáticas, Versicolor y Virginica.
 
+\newpage
+
 \subsection{LDA}
 
 LDA se basa en transformar el espacio donde se encuentran los datos a un nuevo espacio con menor dimensionalidad pero mayor separabilidad entre los datos, de forma que la clasificación sea mucho más sencilla. Para que esto funcione LDA tiene algunas asunciones sobre el conjunto de datos sobre el que trabaja:
@@ -112,12 +114,36 @@ Al igual que con K-NN, LDA tampoco ha tenido problemas para clasificar los datos
 
 Y como era de esperar al utilizar el mismo conjunto de test y tener una precisión del 100\%, obtenemos el mismo resultado que con K-NN.
 
+Aunque no se han conseguido superar las asunciones, LDA ha funcionado ya que ha podido obtener un buen espacio donde maximizar la separabilidad y debido a la simplicidad del conjunto de datos.
+
 \subsection{QDA}
+
+QDA se comporta de la misma forma que LDA, pero este estima una covarianza distinta para cada clase. Por este motivo, las asunciones son las mismas que para LDA, eliminando la asunción de tener la misma matriz de covarianza.
 
 \subsubsection{Comprobación de las asunciones}
 
-\subsubsection{Resultados}
+Al tener las mismas asunciones que LDA, ya hemos realizado este estudio, donde obtendriamos los mismo resultados que LDA pero sin tener en cuenta la tercera asunción, por lo que podemos deducir que QDA tendrá también muy buenos resultados, ya que donde más problemas teníamos en LDA era en la tercera asunción.
 
+\subsubsection{Ejecución y resultados}
+
+De nuevo se ha utilizado caret para aplicar la validación cruzada, obteniendo un 96\% de precisión en validación cruzada y un 100\% de precisión en el conjunto de test:
+
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/matriz_confusion_qda}
+	\caption{Matriz de confusión del conjunto de test tras aplicar QDA.}
+	\label{fig:matriz_confusion_qda}
+\end{figure}
+
+
+Y al igual que con los otros modelos, se han mostrado gráficamente las predicciones con respecto a los predictores del pétalo:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{iris/predicciones_qda}
+	\label{fig:predicciones_qda}
+\end{figure}
 
 \subsection{Comparación entre múltiples modelos}
 
