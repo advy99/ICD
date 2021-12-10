@@ -234,8 +234,12 @@ iris_plot[-muestras_train, "test"] <- 1
 iris_plot$test <- as.factor(iris_plot$test) 
 str(iris_plot)
 
+which(iris_plot$Class != iris$Class)
+
 ggplot(iris_plot, aes(x = PetalLength, y = PetalWidth, color = Class, shape = test)) +
 	geom_point(size = 5) + 
+	geom_rect(data = iris_plot[which(iris_plot$Class != iris$Class),], aes(xmin = PetalLength - 0.03, xmax = PetalLength + 0.03, ymin = PetalWidth - 0.05, ymax = PetalWidth + 0.05)) +
+	geom_point(data = iris_plot[which(iris_plot$Class != iris$Class),], size = 5) +
 	labs(title = "Predicciones utilizando QDA")
 ggsave("out/iris/predicciones_qda.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
