@@ -203,10 +203,64 @@ Al igual que con el modelo de regresión lineal múltiple, se ha realizado un gr
 
 \subsection{Comparación entre algoritmos}
 
-\subsubsection{Comparación entre regresión múltiple y K-NN}
+En esta sección compararemos los resultados de regresión lineal y K-NN tras ejecutarlos en 17 conjuntos de datos distintos, incluido el conjunto utilizado en este trabajo.
+
+Tras esta comparación añadiremos un tercer método, el MD5', para comprobar si alguno de estos tres es mejor.
+
+Estas comparaciones las realizaremos utilizando métodos estadísticos, aunque antes tendremos que obtener unos resultados fiables de los algoritmos utilizados para nuestro conjunto de datos, por lo que aplicaremos validación cruzada a los mejores modelos obtenidos.
+
+\subsubsection{Ejecución de los algoritmos con validación cruzada}
+
+Tras lanzar los modelos obtenidos en los apartados anteriores utilizando validación cruzada con los cinco folds dados, se obtienen los siguientes resultados:
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Método} & \textbf{Train} & \textbf{Test} \\ \hline
+\textbf{LM}     & 360383.1       & 434420.4      \\ \hline
+\textbf{K-NN}   & 189809         & 558852.9      \\ \hline
+\end{tabular}%
+}
+\caption{MSE obtenido en el conjunto de entrenamiento y test para cada método.}
+\end{table}
+
+Como podemos observar, aunque parecía que K-NN se iba a comportar mejor que regresión lineal para este problema, en realidad es que cuenta con un alto sobreajuste, haciendo que aprenda muy bien los datos con los que entrena pero se comporta mal con datos nuevos.
+
+\subsubsection{Comparación entre regresión lineal múltiple y K-NN}
+
+Tras haber obtenido los datos de nuestros modelos para el dataset baseball y haberlos modificado en la tabla con todos los resultados de los distintos conjuntos de datos, realizamos la comparación entre regresión lineal múltiple y K-NN utilizando el test de Wilcoxon.
+
+Para lanzar este test tenemos que obtener la tabla de diferencias normalizadas entre los resultados en regresión lineal multiple y K-NN. Tnemos que tener en cuenta que el test falla si encuentra algún cero en esta tabla, así que lo solucionamos añadiendo un valor poco significativo (0.1) si encuentra un cero.
+
+Tras obtener esta tabla, lanzamos el test, del que obtenemos un p-value de 0.83, por lo que no podemos rechazar la hipotesis nula de que no hay diferencias significativas entre los dos métodos para los conjuntos de datos utilizados.
 
 \subsubsection{Comparación entre múltiples modelos}
 
+Para realizar esta comparación simplemente utilizaremos el test de Friedman para saber si existe alguna diferencia significativa entre una pareja de algoritmos, si el resultado es que si existe una diferencia significativa aplicaremos el test de Holm como post-hoc para saber entre que dos algoritmos se ha encontrado esa diferencia significativa.
+
+Tras lanzar el test de Friedman nos devuelve un p-value de 0.014, con lo que con un nivel de confianza de más del 98\% podemos rechazar la hipotesis nula de que no existen diferencias significativas entre una pareja de algoritmos, por lo que sabemos que hay al menos un algoritmo que es mejor que otro.
+
+Si aplicamos el test de Holm obtendremos la siguiente tabla:
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{}  & \textbf{1} & \textbf{2} \\ \hline
+\textbf{2} & 0.58      & -          \\ \hline
+\textbf{3} & 0.08      & 0.10      \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+En la que como vemos, existen diferencias significativas a favor de M5', tanto contra regresión lineal con una confianza del 99\% como con K-NN con una confianza del 90\%.
 
 \subsection{Código R}
 
