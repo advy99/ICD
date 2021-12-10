@@ -126,7 +126,7 @@ Al tener las mismas asunciones que LDA, ya hemos realizado este estudio, donde o
 
 \subsubsection{Ejecución y resultados}
 
-De nuevo se ha utilizado caret para aplicar la validación cruzada, obteniendo un 96\% de precisión en validación cruzada y un 100\% de precisión en el conjunto de test:
+De nuevo se ha utilizado caret para aplicar la validación cruzada, obteniendo un 96\% de precisión en validación cruzada y un 96\% de precisión en el conjunto de test:
 
 
 \begin{figure}[H]
@@ -136,17 +136,26 @@ De nuevo se ha utilizado caret para aplicar la validación cruzada, obteniendo u
 	\label{fig:matriz_confusion_qda}
 \end{figure}
 
-
-Y al igual que con los otros modelos, se han mostrado gráficamente las predicciones con respecto a los predictores del pétalo:
+Vamos al igual que con los otros modelos, se han mostrado gráficamente las predicciones con respecto a los predictores del pétalo, en este caso con más interés ya que se ha tenido un fallo:
 
 \begin{figure}[H]
 	\centering
 	\includesvg[width = 500pt]{iris/predicciones_qda}
+	\caption{Predicciones realizadas por QDA representadas usando los predictores del pétalo. Los valores erroneos están dentro de un cuadrado.}
 	\label{fig:predicciones_qda}
 \end{figure}
 
+Como vemos este fallo, enmarcado en un cuadrado en la gráfica, se trata de un valor cercano a la zona donde se solapan ambas clases, zona en la que QDA no ha podido separar bien ambas clases y por lo tanto ha fallado al clasificar ese valor del conjunto de test, teniendo un acierto en test similar al de entrenamiento.
+
 \subsection{Comparación entre múltiples modelos}
 
+Tras haber aplicado los distintos modelos al conjunto de datos, pasamos a realizar una comparación entre los tres modelos (K-NN, LDA y QDA) utilizando los resultados de aplicarlos sobre 19 conjuntos de datos distintos, incluido el nuestro.
+
+Para empezar, se ha calculado utilizando validación cruzada con los folds dados por los profesores la precisión de los modelos para iris, nuestro conjunto de datos.
+
+Tras obtener estos resultados y modificarlos en la tabla con todos los conjuntos de datos se ha aplicado el test de Friedman para comprobar si existen diferencias significativas entre una pareja de algoritmos, y si este test nos dice que existe alguna diferencia significativa se aplicará el test de Holm como post-hoc para encontrar donde está esa diferencia significativa.
+
+Al lanzar el test de Friedman vemos que nos devuelve un p-value de 0.7, luego no podemos rechazar la hipotesis nula de que no existen diferencias significativas entre al menos una pareja de algoritmos, así que parece ser que para los conjuntos de datos utilizados no hay evidencias estadísticas que nos lleven a decantarnos por uno de estos tres algoritmos.
 
 \subsection{Código R}
 
@@ -390,8 +399,14 @@ iris_plot[-muestras_train, "test"] <- 1
 iris_plot$test <- as.factor(iris_plot$test)
 str(iris_plot)
 
+# miramos cual ha fallado
+which(iris_plot$Class != iris$Class)
+
+# dibujamos un rectangulo para marcarlo
 ggplot(iris_plot, aes(x = PetalLength, y = PetalWidth, color = Class, shape = test)) +
 	geom_point(size = 5) +
+	geom_rect(data = iris_plot[which(iris_plot$Class != iris$Class),], aes(xmin = PetalLength - 0.03, xmax = PetalLength + 0.03, ymin = PetalWidth - 0.05, ymax = PetalWidth + 0.05)) +
+	geom_point(data = iris_plot[which(iris_plot$Class != iris$Class),], size = 5) +
 	labs(title = "Predicciones utilizando QDA")
 ggsave("out/iris/predicciones_qda.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
 
