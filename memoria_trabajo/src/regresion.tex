@@ -11,7 +11,172 @@ Tras aplicar estos métodos realizaremos una comparación estadistica entre ello
 
 \subsection{Regresión lineal simple}
 
+El método de regresión lineal simple se trata de encontrar la linea que mejor se ajuste a unos datos de entrenamiento, normalmente utilizando el método de mínimos cuadrados.
+
+En este caso el modelo tendrá la siguiente forma:
+
+\[
+Y = \beta_0 + \beta_1 \cdot X + \epsilon
+\]
+
+Donde $\beta_0$ y $\beta_1$ son las dos constantes desconocidas que estimaremos con mínimos cuadrados, $\epsilon$ un termino de error, $X$ el valor del predictor e $Y$ el valor real de la variable objetivo.
+
+En este caso, tras obtener los valores de las constantes, tendremos el siguiente modelo:
+
+\[
+\hat{y} = \hat{\beta_0} + \hat{\beta_1} \cdot x
+\]
+
+Este modelo nos servirá para hacer una predicción del valor de $Y$ que llamaremos $\hat{y}$ gracias a la estimación de las constantes.
+
+En este caso vamos a realizar cinco ajustes con cinco predictores distintos.
+
+\subsubsection{Selección de predictores}
+
+De cara a seleccionar los cinco predictores con los que realizar cada uno de los ajustes he decidido escoger los predictores con mayor correlación con la variable a predecir, el salario. En el código en R adjunto de esta sección está disponible como se ha automatizado esto haciendo uso de la función \texttt{cor} para obtener las correlaciones y obtener las más altas, además del estudio que se realizó en el análisis exploratorio de los datos \ref{fig:matriz_correlaciones_baseball}.
+
+Los predictores escogidos, ordenados de mayor a menor correlación, son:
+
+\begin{itemize}
+	\item Runs batted in, con una correlación de 0.6684219 con Salary.
+	\item Runs, con una correlación de 0.6429035 con Salary.
+	\item Hits, con una correlación de 0.6212390 con Salary.
+	\item HomeRuns, con una correlación de 0.5904536 con Salary.
+	\item Doubles, con una correlación de 0.5774227 con Salary.
+\end{itemize}
+
+\subsubsection{Resultados}
+
+Tras ajustar el modelo con \texttt{lm} obtenemos los siguientes resultados.
+
+El modelo utilizando el predictor Runs batted in consigue un MSE de 848113.1 y un valor de $R^2$ ajustada de 0.4451. En el siguiente gráfico podemos ver la linea de ajuste obtenida:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/ajuste_lm/ajuste_lm_Runs_batted_in}
+	\caption{Ajuste regresión lineal simple en baseball utilizando el predictor Runs\_batted\_in.}
+	\label{fig:ajuste_Runs_batted_in}
+\end{figure}
+
+El modelo utilizando el predictor Runs consigue un MSE de 899414.2 y un valor de $R^2$ ajustada de 0.4116. En el siguiente gráfico podemos ver la linea de ajuste obtenida:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/ajuste_lm/ajuste_lm_Runs}
+	\caption{Ajuste regresión lineal simple en baseball utilizando el predictor Runs.}
+	\label{fig:ajuste_Runs}
+\end{figure}
+
+El modelo utilizando el predictor Hits consigue un MSE de 941400.4 y un valor de $R^2$ ajustada de 0.3841. En el siguiente gráfico podemos ver la linea de ajuste obtenida:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/ajuste_lm/ajuste_lm_Hits}
+	\caption{Ajuste regresión lineal simple en baseball utilizando el predictor Hits.}
+	\label{fig:ajuste_Hits}
+\end{figure}
+
+El modelo utilizando el predictor HomeRuns consigue un MSE de 998587.7 y un valor de $R^2$ ajustada de 0.3467. En el siguiente gráfico podemos ver la linea de ajuste obtenida:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/ajuste_lm/ajuste_lm_HomeRuns}
+	\caption{Ajuste regresión lineal simple en baseball utilizando el predictor HomeRuns.}
+	\label{fig:ajuste_HomeRuns}
+\end{figure}
+
+El modelo utilizando el predictor Doubles consigue un MSE de 1021919 y un valor de $R^2$ ajustada de 0.3314. En el siguiente gráfico podemos ver la linea de ajuste obtenida:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 400pt]{baseball/ajuste_lm/ajuste_lm_Doubles}
+	\caption{Ajuste regresión lineal simple en baseball utilizando el predictor Doubles.}
+	\label{fig:ajuste_Doubles}
+\end{figure}
+
+Como era de esperar, a una mayor correlación con la variable de salida, un mejor MSE, y un menor $R^2$, ya que la linea obtenida se aleja de la linea que ajusta de forma perfecta los datos, que tendría un $R^2$ de uno y un MSE de cero.
+
+\begin{table}[H]
+	\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Predictor}      & \textbf{\begin{tabular}[c]{@{}c@{}}Correlación\\ con Salary\end{tabular}} & \textbf{MSE} & \textbf{$R^2$} \\ \hline
+\textbf{Runs batted in} & 0.668                                                                     & 848113.1     & 0.4451                        \\ \hline
+\textbf{Runs}           & 0.642                                                                     & 899414.2     & 0.4116                        \\ \hline
+\textbf{Hits}           & 0.621                                                                     & 941400.4     & 0.3841                        \\ \hline
+\textbf{HomeRuns}       & 0.590                                                                     & 998587.7     & 0.3467                        \\ \hline
+\textbf{Doubles}        & 0.577                                                                     & 1021919      & 0.3314                        \\ \hline
+\end{tabular}
+\end{table}
+
+
 \subsection{Regresión lineal múltiple}
+
+Este modelo se basa en ajustarse a los datos, pero en lugar de utilizar una linea (un solo predictor), utilizar multiples predictores, generando un hiperplano con el que predecir la variable de salida.
+
+En este caso la fórmula tendrá la siguiente forma:
+
+\[
+\hat{y} = \hat{\beta_0} + \hat{\beta_1} \cdot x + \cdots + \hat{\beta_n} \cdot x_n
+\]
+
+Donde utilizaremos $n$ predictores y por lo tanto tendremos $n + 1$ constantes, que al igual que con regresión lineal simple, estimaremos con el método de mínimos cuadrados.
+
+\subsubsection{Obtención del modelo lineal múltiple básico}
+
+De cara a obtener el modelo lineal múltiple se ha utilizado una metodología decremental, en el que se ha comenzado utilizando todos los predictores posibles para predecir el salario, y en cada pase se ha eliminado un único predictor, el considerado menos relevante por el modelo, de cara a mejorar los resultados y simplificar el modelo completo buscando aumentar su $R^2$. Para decidir que predictor eliminar, en cada modelo generado se ha consultado su información con el comando \texttt{summary} que nos da información sobre si un predictor es relevante a través de un p-value, si dicho p-value es menor a $0.05$ se considera relevante un predictor.
+
+En el código adjunto al final de esta sección está disponible todos los pasos realizados comentando los resultados de cada paso, aquí simplemente realizaré los primeros pasos para explicar la metodología.
+
+Comenzamos con el modelo con todos los predictores y miramos su summary:
+
+\begin{lstlisting}[language=R]
+fit_lm_multiple <- lm(Salary ~ ., data = baseball)
+summary(fit_lm_multiple)
+\end{lstlisting}
+
+Al ejecutar este código vemos que obtenemos un $R^2$ de 0.6865, bastante mayor que el obtenido con regresión simple. También vemos como el predictor Doubles tiene el mayor p-value, con casi un 0.9, por lo que no es relevante para el modelo, así que volvemos a entrenar el modelo pero sin ese predictor:
+
+\begin{lstlisting}[language=R]
+fit_lm_multiple <- lm(Salary ~ . - Doubles, data = baseball)
+summary(fit_lm_multiple)
+\end{lstlisting}
+
+Y con la salida de esta ejecución, volvemos a repetir estos pasos, eliminando en cada paso únicamente un predictor.
+
+Como resultado final se obtiene el siguiente modelo:
+
+\begin{lstlisting}[language=R]
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs - Free_agent, data = baseball)
+\end{lstlisting}
+
+Como vemos, hemos eliminado muchos predictores, y nos hemos quedado finalmente con los más importante, obteniendo un $R^2$ de 0.68, mejorando en gran cantidad el modelo de regresión lineal simple y reduciendo el MSE a 480894.9.
+
+
+\subsubsection{Interacciones y no linealidad}
+
+Tras obtener el modelo lineal múltiple se ha probado a introducir distintas interacciones entre predictores y no linealidad.
+
+Algunas de estas interacciones e introducción de no linealidad ha funcionado, sin embargo otras no, todos las combinaciones que se han probado están especificadas en el código ejecutado con comentarios sobre las pruebas. Cabe destacar que en todo caso se ha tenido en cuenta que si se ha probado a introducir una interacción o no linealidad siempre se ha introducido en el modelo los términos base para que se ajuste de forma correcta.
+
+Se ha probado con varios predictores correlados entre si, como Free agency eligibility y Runs batted in, además de predictores que podría tener sentido que influyeran en el salario, como pueden ser Runs y Hits, funcionando ambas interacciones bastante bien, sin embargo, otras como Batting average con On base percentage que podría parecer que funcionarían no han aportado información al modelo.
+
+De cara a introducir no linealidad se han probado con distintos predictores que no han funcionado en el modelo lineal, esperando que la relación entre el predictor y el salario no fuera lineal, sin embargo solo ha funcionado la introducción de no linealidad con el predictor Doubles con termino cuadrático y cúbico y con el término Errors.
+
+\newpage
+
+\subsubsection{Resultados del modelo final}
+
+Tras realizar el estudio del mejor modelo lineal múltiple e introducir interacciones y no linealidad, el mejor modelo ha obtenido un valor de $R^2$ de 0.75 y un MSE de 367189.1, bastante mejor que con el modelo de regresión lineal simple y el modelo múltiple sin interacciones y no linealidad.
+
+De cara a observar como son las predicciones que realiza, se ha realizado el siguiente gráfico donde podemos ver el salario con respecto al predictor con mayor correlación, Runs batted in, en rojo los valores reales y en azul los valores predichos:
+
+\begin{figure}[H]
+	\centering
+	\includesvg[width = 500pt]{baseball/predicciones_lm_completo}
+	\caption{Predicciones realizadas por el modelo de regresión lineal múltiple con interacciones y no linealidad.}
+	\label{fig:predicciones_lm_completo}
+\end{figure}
 
 \subsection{K-NN}
 
@@ -20,3 +185,567 @@ Tras aplicar estos métodos realizaremos una comparación estadistica entre ello
 \subsubsection{Comparación entre regresión múltiple y K-NN}
 
 \subsubsection{Comparación entre múltiples modelos}
+
+
+\subsection{Código R}
+
+En esta sección está el código ejecutado en esta sección:
+
+\begin{lstlisting}[language=R]
+library(tidyverse)
+library(readr)
+library(GGally)
+library(corrplot)
+library(kknn)
+library(readr)
+
+set.seed(2)
+
+#
+# Funciones
+#
+
+calcular_MSE <- function(valores_reales, valores_predecidos) {
+	sum((valores_predecidos - valores_reales)^2)/length(valores_reales)
+}
+
+calcular_RMSE <- function(valores_reales, valores_predecidos) {
+	sqrt(sum((valores_predecidos - valores_reales)^2)/(length(valores_reales)-2))
+}
+
+# creamos si es necesario los directorios a usar de salida
+directorios_necesarios <- list("out", "out/baseball", "out/baseball/ajuste_lm")
+
+lapply(directorios_necesarios, function(directorio) {if (!dir.exists(directorio)) dir.create(directorio) })
+
+
+# leemos los datos
+baseball <- read.csv("data/baseball/baseball.dat", comment.char = "@", header = FALSE)
+
+# le asignamos los nombres de las columnas
+names(baseball) <- c("Batting_average", "On-base_percentage", "Runs", "Hits",
+					 "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+					 "Strike-Outs", "Stolen_bases", "Errors",
+					 "Free_agency_eligibility", "Free_agent",
+					 "Arbitration_eligibility", "Arbitration", "Salary")
+
+
+matriz_correlaciones_baseball <- cor(baseball)
+# convertimos la matriz a dataframe
+matriz_correlaciones_baseball <- as.data.frame(matriz_correlaciones_baseball)
+
+# nos quedamos con los cinco predictores más correlados
+cinco_mas_correladas <- matriz_correlaciones_baseball %>% select(Salary) %>% # nos quedamos solo con la fila de salario
+														  top_n(6) %>% # nos quedamos con las 6 mejores (son todas positivas)
+														  arrange(desc(Salary)) %>% # las ordenamos por correlacion
+														  slice(-c(1)) # eliminamos la primera fila (el propio salario)
+nombres_cinco_mas_correladas <- row.names(cinco_mas_correladas)
+nombres_cinco_mas_correladas
+
+# saco las formulas del salario dependiendo de cada predictor
+formulas_mas_correlados <- lapply(nombres_cinco_mas_correladas, function(predictor) {
+	as.formula(paste("Salary ~ ", predictor))
+})
+
+# aplico la regresión lineal simple de cada formula
+fit_lm_baseball <- lapply(formulas_mas_correlados, function(formula_lm) {
+	lm(formula_lm, data = baseball)
+})
+
+# miramos el summary de todos los ajustes
+lapply(fit_lm_baseball, summary)
+
+# calculamos el MSE
+lapply(fit_lm_baseball, function (fit) {
+	nombre_predictor <- fit$terms[[3]]
+	calcular_MSE(baseball$Salary, predict(fit, baseball$nombre_predictor))
+})
+
+# calculamos el RMSE
+lapply(fit_lm_baseball, function (fit) {
+	nombre_predictor <- fit$terms[[3]]
+	calcular_RMSE(baseball$Salary, predict(fit, baseball$nombre_predictor))
+})
+
+
+# guardamos en disco un grafico con el ajuste obtenido
+lapply(fit_lm_baseball, function (fit) {
+	nombre_predictor <- fit$terms[[3]]
+	svg(paste("out/baseball/ajuste_lm/ajuste_lm_", nombre_predictor, ".svg", sep = ""))
+	plot(as.formula(paste("Salary ~", nombre_predictor) ), baseball)
+	abline(fit, col="blue")
+	dev.off()
+	par(mfrow=c(1,1))
+})
+
+#
+# Regresión lineal multiple
+#
+
+# aplicamos construcción del modelo top-down
+
+fit_lm_multiple <- lm(Salary ~ ., data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6865
+
+# eliminamos la menos significativas: las que tienen mayor p-value
+fit_lm_multiple <- lm(Salary ~ . - Doubles, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6865
+
+# eliminamos la menos significativas
+
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits, data = baseball)
+
+summary(fit_lm_multiple)
+# conseguimos un adjusted R-sqared de 0.6878
+
+# eliminamos la menos significativas
+
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average, data = baseball)
+
+summary(fit_lm_multiple)
+# conseguimos un adjusted R-sqared de 0.6881
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6883
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage`, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6886
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6883, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6874, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.6865, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs, data = baseball)
+
+summary(fit_lm_multiple)
+
+
+# conseguimos un adjusted R-sqared de 0.685, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+
+# A partir de este punto eliminamos características con un p-value < 0.05, por lo que
+# podríamos considerarlas significativas, aun así seguiré para probar un modelo simple
+#
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs - Free_agent, data = baseball)
+
+summary(fit_lm_multiple)
+
+
+# conseguimos un adjusted R-sqared de 0.68, aunque hemos bajado, no es nada significativo
+# seguimos eliminando predictores
+
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs - Free_agent - HomeRuns, data = baseball)
+
+summary(fit_lm_multiple)
+
+# conseguimos un adjusted R-sqared de 0.67, en este punto hemos bajado un 1% de golpe,
+# y eliminando una variable considerada significativa, por lo que el modelo final será el anterior
+# a este
+
+
+# eliminamos la menos significativas
+fit_lm_multiple <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - `On-base_percentage` - Triples - Arbitration - Errors - Runs - Free_agent, data = baseball)
+
+summary(fit_lm_multiple)
+
+calcular_MSE(baseball$Salary, predict(fit_lm_multiple, baseball))
+calcular_RMSE(baseball$Salary, predict(fit_lm_multiple, baseball))
+
+# como vemos, hemos bajado de 848113.1 de MSE y 923 de RMSE a 480894.9 y 695 respectivamente,
+# y de un adjusted R-squared de 0.4451 a uno de 0.6806, mejoras bastante significativas
+
+
+# probamos interacciones: voy  a probar entre predictores que estén correlados entre si, y
+# cada uno de ellos con el salario
+# pruebo interaccion HomeRuns y Runs en las que batea
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks -
+									  `On-base_percentage` - Triples - Arbitration - Errors -
+									  Runs - Free_agent + Free_agency_eligibility*Runs_batted_in,
+									  data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+
+# probamos la interaccion entre Runs y Hits, ya que tiene sentido que estas dos
+# tengan relacion con el salario
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration - Errors -
+										 Free_agent + Free_agency_eligibility*Runs_batted_in + Runs*Hits,
+										data = baseball)
+# esta interacción la ha considerado importante, aunque no ha mejorado mucho el R-squared
+
+
+summary(fit_lm_multiple_interacciones)
+
+# eliminamos HomeRuns, ya que con esta interacción ha considerado que no es importante
+# ya que la información que aporta seguramente la aporte esta nueva interaccion
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration - Errors -
+										 Free_agent - HomeRuns + Free_agency_eligibility*Runs_batted_in + Runs*Hits,
+										data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+# voy a probar tambien entre batting_average y on-base-percentage, ya que
+# creo que puede existir asociación entre el porcentaje de veces que llega a una base
+# y la media de veces que una persona batea
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Walks -
+										Triples - Arbitration - Errors -
+										Free_agent - HomeRuns + Free_agency_eligibility*Runs_batted_in +
+										Runs*Hits + Batting_average*`On-base_percentage`,
+										data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+
+# pruebo tambien Runs_batted_in con Arbitration_eligibility
+fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration - Errors -
+										Free_agent - HomeRuns + Runs*Hits +
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in,
+										data = baseball)
+
+summary(fit_lm_multiple_interacciones)
+
+# tambien ha funcionado bien, r^2 pasa de 0.71 a 0.7367
+
+# calculamos el MSE y RMSE con las interacciones
+calcular_MSE(baseball$Salary, predict(fit_lm_multiple_interacciones, baseball))
+calcular_RMSE(baseball$Salary, predict(fit_lm_multiple_interacciones, baseball))
+
+# hemos bajado de 480894.9 y 695 MSE y RMSE respectivamente a 391673.8 y 627.7039,
+# y de un adjusted R-squared de 0.6806 a uno de 0.7367, mejoras bastante significativas
+
+
+# pasamos a probar no linealidad
+
+# voy a probar con algunos predictores que no funcionaron de forma lineal
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration - Errors -
+										Free_agent - HomeRuns + Runs*Hits +
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^2),
+										data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# tras introducir el termino de no linealidad con doubles este predictor si ha pasado a tener importancia
+
+
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration - Errors -
+										Free_agent - HomeRuns + Runs*Hits +
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) ,
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# si en lugar de al cuadrado introducimos la caracteristica al cubo mejoramos
+# un poco más el adjusted R-squared hasta llegar al 0.7414
+
+# probamos batting average
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles + Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration - Errors -
+										Free_agent - HomeRuns + Runs*Hits +
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) +
+										I(Batting_average^2),
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# como vemos no ha funcionado, así que lo eliminamos
+# y como doubles ha funcionado, vamos a probar con los triples
+
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks -
+										`On-base_percentage` + Triples - Arbitration - Errors -
+										Free_agent - HomeRuns + Runs*Hits +
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) +
+										I(Triples^2),
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# como vemos este tampoco ha funcionado
+
+# probamos con Errors
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration + Errors -
+										Free_agent - HomeRuns + Runs*Hits +
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) +
+										I(Errors^2),
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# si lo considera significativo, subiendo el adjusted R-squared a 0.7499
+
+# probamos con Errors al cubo
+fit_lm_multiple_no_linealidad <- lm(Salary ~ . + Doubles - Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration + Errors -
+										Free_agent - HomeRuns + Runs*Hits +
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) +
+										I(Errors^2 + Errors^3),
+									data = baseball)
+
+summary(fit_lm_multiple_no_linealidad)
+
+# mejora un poco, pero nada significativo
+
+# este será nuestro modelo final
+calcular_MSE(baseball$Salary, predict(fit_lm_multiple_no_linealidad, baseball))
+calcular_RMSE(baseball$Salary, predict(fit_lm_multiple_no_linealidad, baseball))
+
+# hemos bajado de 391673.8 y 627.7039 MSE y RMSE respectivamente a 367189.1 y 607.7675,
+# y de un adjusted R-squared de 0.7367 a uno de 0.7501, mejoras bastante significativas
+
+
+# predecimos las del mejor modelo
+predicciones_train <- predict(fit_lm_multiple_no_linealidad, baseball)
+
+ggplot(baseball %>% mutate(Salary_predicho = predicciones_train) %>% pivot_longer(Salary:Salary_predicho), aes(x = Runs_batted_in, y = value, color = name)) +
+	geom_point() +
+	labs(title = "Predicciones utilizando el modelo lineal\n múltiple con interacciones y no linealidad",
+		 subtitle = "Utilizando característica con mayor correlación con el salario.") +
+	ylab("Salary")
+ggsave("out/baseball/predicciones_lm_completo.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
+
+#
+# KNN
+#
+
+# por defecto kernel = optimal y scale = TRUE
+fit_knn <- kknn(Salary ~ ., baseball, baseball)
+
+calcular_MSE(baseball$Salary, fit_knn$fitted.values)
+calcular_RMSE(baseball$Salary, fit_knn$fitted.values)
+
+fit_knn_mejor_lm <- fit_knn <- kknn(Salary ~ . + Doubles - Batting_average - Walks -
+										`On-base_percentage` - Triples - Arbitration + Errors -
+										Free_agent - HomeRuns + Runs*Hits +
+										Free_agency_eligibility * Runs_batted_in +
+										Arbitration_eligibility * Runs_batted_in +
+										I(Doubles^3 + Doubles^2) +
+										I(Errors^2 + Errors^3),
+									baseball, baseball)
+
+calcular_MSE(baseball$Salary, fit_knn_mejor_lm$fitted.values)
+calcular_RMSE(baseball$Salary, fit_knn_mejor_lm$fitted.values)
+
+# como vemos la opción con la formula de lm es algo mejor, pero tampoco mucho
+
+
+ggplot(baseball %>% mutate(Salary_predicho = fit_knn_mejor_lm$fitted.values) %>% pivot_longer(Salary:Salary_predicho), aes(x = Runs_batted_in, y = value, color = name)) +
+	geom_point() +
+	labs(title = "Predicciones utilizando KNN",
+		 subtitle = "Utilizando característica con mayor correlación con el salario.") +
+	ylab("Salary")
+ggsave("out/baseball/predicciones_knn.svg", device = svg, width = 1920, height = 1080, units = "px", dpi = 150)
+
+
+
+nombre <- "data/baseball/baseball"
+
+run_lm_fold <- function(i, x, tt = "test") {
+	file <- paste(x, "-5-", i, "tra.dat", sep="")
+	x_tra <- read.csv(file, comment.char="@", header=FALSE)
+	file <- paste(x, "-5-", i, "tst.dat", sep="")
+	x_tst <- read.csv(file, comment.char="@", header=FALSE)
+	names(x_tra) <- c("Batting_average", "On-base_percentage", "Runs", "Hits",
+						 "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+						 "Strike-Outs", "Stolen_bases", "Errors",
+						 "Free_agency_eligibility", "Free_agent",
+						 "Arbitration_eligibility", "Arbitration", "Salary")
+
+	names(x_tst) <- c("Batting_average", "On-base_percentage", "Runs", "Hits",
+					  "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+					  "Strike-Outs", "Stolen_bases", "Errors",
+					  "Free_agency_eligibility", "Free_agent",
+					  "Arbitration_eligibility", "Arbitration", "Salary")
+
+	if (tt == "train") {
+		test <- x_tra
+	}
+	else {
+		test <- x_tst
+	}
+
+	fitMulti=lm(Salary ~ . + Doubles - Batting_average - Walks -
+					`On-base_percentage` - Triples - Arbitration + Errors -
+					Free_agent - HomeRuns + Runs*Hits +
+					Free_agency_eligibility * Runs_batted_in +
+					Arbitration_eligibility * Runs_batted_in +
+					I(Doubles^3 + Doubles^2) +
+					I(Errors^2 + Errors^3), data = x_tra)
+
+	yprime=predict(fitMulti,test)
+	sum(abs(test$Salary-yprime)^2)/length(yprime) ##MSE
+}
+
+lmMSEtrain<-mean(sapply(1:5,run_lm_fold,nombre,"train"))
+lmMSEtest<-mean(sapply(1:5,run_lm_fold,nombre,"test"))
+
+
+
+run_knn_fold <- function(i, x, tt = "test") {
+	file <- paste(x, "-5-", i, "tra.dat", sep="")
+	x_tra <- read.csv(file, comment.char="@", header=FALSE)
+	file <- paste(x, "-5-", i, "tst.dat", sep="")
+	x_tst <- read.csv(file, comment.char="@", header=FALSE)
+	In <- length(names(x_tra)) - 1
+	names(x_tra) <- c("Batting_average", "On-base_percentage", "Runs", "Hits",
+					  "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+					  "Strike-Outs", "Stolen_bases", "Errors",
+					  "Free_agency_eligibility", "Free_agent",
+					  "Arbitration_eligibility", "Arbitration", "Salary")
+
+	names(x_tst) <- c("Batting_average", "On-base_percentage", "Runs", "Hits",
+					  "Doubles", "Triples", "HomeRuns", "Runs_batted_in", "Walks",
+					  "Strike-Outs", "Stolen_bases", "Errors",
+					  "Free_agency_eligibility", "Free_agent",
+					  "Arbitration_eligibility", "Arbitration", "Salary")
+
+	if (tt == "train") {
+		test <- x_tra
+	}
+	else {
+		test <- x_tst
+	}
+
+	fitMulti=kknn(Salary ~ . + Doubles - Batting_average - Walks -
+					`On-base_percentage` - Triples - Arbitration + Errors -
+					Free_agent - HomeRuns + Runs*Hits +
+					Free_agency_eligibility * Runs_batted_in +
+					Arbitration_eligibility * Runs_batted_in +
+					I(Doubles^3 + Doubles^2) +
+					I(Errors^2 + Errors^3),x_tra, test)
+
+	yprime=fitMulti$fitted.values
+	sum(abs(test$Salary - yprime)^2)/length(yprime) ##MSE
+}
+
+knnMSEtrain <- mean(sapply(1:5,run_knn_fold,nombre,"train"))
+knnMSEtest <- mean(sapply(1:5,run_knn_fold,nombre,"test"))
+
+
+lmMSEtrain
+lmMSEtest
+
+knnMSEtrain
+knnMSEtest
+
+tabla_resultados_test <- read.csv("data/regr_test_alumnos.csv")
+tabla_resultados_test
+
+tabla_resultados_test[5, 2] <- lmMSEtest
+tabla_resultados_test[5, 3] <- knnMSEtest
+tabla_resultados_test
+
+tabla_resultados_train <- read.csv("data/regr_train_alumnos.csv")
+tabla_resultados_train
+
+tabla_resultados_train[5, 2] <- lmMSEtrain
+tabla_resultados_train[5, 3] <- knnMSEtrain
+tabla_resultados_train
+
+#
+# Comparativa LM y KNN con los resultados obtenidos
+#
+
+tablatst <- cbind(tabla_resultados_test[,2:dim(tabla_resultados_test)[2]])
+colnames(tablatst) <- names(tabla_resultados_test)[2:dim(tabla_resultados_test)[2]]
+rownames(tablatst) <- tabla_resultados_test[,1]
+
+# sacamos las diferencias usando la tabla de test
+difs <- (tablatst[,1] - tablatst[,2]) / tablatst[,1]
+wilc_1_2 <- cbind(ifelse (difs<0, abs(difs)+0.1, 0+0.1), ifelse (difs>0, abs(difs)+0.1, 0+0.1))
+colnames(wilc_1_2) <- c(colnames(tablatst)[1], colnames(tablatst)[2])
+head(wilc_1_2)
+
+LMvsKNNtst <- wilcox.test(wilc_1_2[,1], wilc_1_2[,2], alternative = "two.sided", paired=TRUE)
+Rmas <- LMvsKNNtst$statistic
+pvalue <- LMvsKNNtst$p.value
+LMvsKNNtst <- wilcox.test(wilc_1_2[,2], wilc_1_2[,1], alternative = "two.sided", paired=TRUE)
+Rmenos <- LMvsKNNtst$statistic
+Rmas
+Rmenos
+pvalue
+
+# como el p-value es tan alto, no podemos decir que haya diferencias significativas
+# entre LM y KNN para los conjuntos de datos que hemos usado
+
+
+#
+# Comparativa de los tres algoritmos usando Friedman y Holms
+#
+
+test_friedman <- friedman.test(as.matrix(tablatst))
+test_friedman
+
+# el test de friedman nos dice que con un nivel de confianza de más del 98%,
+# si hay diferencias significativas entre alguno de los tres metodos
+
+tam <- dim(tablatst)
+groups <- rep(1:tam[2], each=tam[1])
+pairwise.wilcox.test(as.matrix(tablatst), groups, p.adjust = "holm", paired = TRUE)
+
+# con este resultado podemos concluir que hay diferencias significativas entre
+# el tercer y el primer algoritmo (a favor del tercer algoritmo),
+# pero no entre el primero y el segundo y el segundo y el terceo (aunque con este último
+# si que las hay si el nivel de confianza es del 90% y no del 5%)
+# Por lo tanto, el tercer algoritmo (M5) es mejor que el primero, pero con el
+# segundo no tenemos tan claro una mejora
+
+\end{lstlisting}
