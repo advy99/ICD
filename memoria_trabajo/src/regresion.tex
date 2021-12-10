@@ -217,14 +217,12 @@ Tras lanzar los modelos obtenidos en los apartados anteriores utilizando validac
 % \usepackage{graphicx}
 \begin{table}[H]
 \centering
-\resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|c|}
 \hline
 \textbf{Método} & \textbf{Train} & \textbf{Test} \\ \hline
 \textbf{LM}     & 360383.1       & 434420.4      \\ \hline
 \textbf{K-NN}   & 189809         & 558852.9      \\ \hline
 \end{tabular}%
-}
 \caption{MSE obtenido en el conjunto de entrenamiento y test para cada método.}
 \end{table}
 
@@ -250,14 +248,12 @@ Si aplicamos el test de Holm obtendremos la siguiente tabla:
 % \usepackage{graphicx}
 \begin{table}[H]
 \centering
-\resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|c|}
 \hline
 \textbf{}  & \textbf{1} & \textbf{2} \\ \hline
 \textbf{2} & 0.58      & -          \\ \hline
 \textbf{3} & 0.08      & 0.10      \\ \hline
 \end{tabular}%
-}
 \end{table}
 
 En la que como vemos, existen diferencias significativas a favor de M5', tanto contra regresión lineal con una confianza del 99\% como con K-NN con una confianza del 90\%.
@@ -824,3 +820,6 @@ pairwise.wilcox.test(as.matrix(tablatst), groups, p.adjust = "holm", paired = TR
 # segundo no tenemos tan claro una mejora
 
 \end{lstlisting}
+
+
+\newpage
