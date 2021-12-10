@@ -42,7 +42,7 @@ matriz_correlaciones_baseball <- as.data.frame(matriz_correlaciones_baseball)
 
 # nos quedamos con los cinco predictores más correlados
 cinco_mas_correladas <- matriz_correlaciones_baseball %>% select(Salary) %>% # nos quedamos solo con la fila de salario
-														  top_n(6) %>% # nos quedamos con las 6 mejores
+														  top_n(6) %>% # nos quedamos con las 6 mejores (son todas positivas)
 														  arrange(desc(Salary)) %>% # las ordenamos por correlacion
 														  slice(-c(1)) # eliminamos la primera fila (el propio salario)
 nombres_cinco_mas_correladas <- row.names(cinco_mas_correladas)
@@ -203,7 +203,7 @@ calcular_RMSE(baseball$Salary, predict(fit_lm_multiple, baseball))
 
 # probamos interacciones: voy  a probar entre predictores que estén correlados entre si, y
 # cada uno de ellos con el salario
-# pruebo interaccion HomeRuns y Runs en las que batea
+# pruebo interaccion Free_agency_eligibility y Runs_batted_in 
 fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_average - Walks - 
 									  `On-base_percentage` - Triples - Arbitration - Errors - 
 									  Runs - Free_agent + Free_agency_eligibility*Runs_batted_in, 
@@ -211,14 +211,12 @@ fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Hits - Batting_averag
 
 summary(fit_lm_multiple_interacciones)
 
-# como vemos, esta interacción no es importante (aunque por muy poco)
-
 
 # probamos la interaccion entre Runs y Hits, ya que tiene sentido que estas dos
 # tengan relacion con el salario
 fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks - 
 										`On-base_percentage` - Triples - Arbitration - Errors - 
-										 Free_agent + Runs*Hits, 
+										 Free_agent + Free_agency_eligibility*Runs_batted_in + Runs*Hits, 
 										data = baseball)
 # esta interacción la ha considerado importante, aunque no ha mejorado mucho el R-squared
 
@@ -229,7 +227,7 @@ summary(fit_lm_multiple_interacciones)
 # ya que la información que aporta seguramente la aporte esta nueva interaccion
 fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks - 
 										`On-base_percentage` - Triples - Arbitration - Errors - 
-										 Free_agent - HomeRuns + Runs*Hits, 
+										 Free_agent - HomeRuns + Free_agency_eligibility*Runs_batted_in + Runs*Hits, 
 										data = baseball)
 
 summary(fit_lm_multiple_interacciones)
@@ -239,25 +237,14 @@ summary(fit_lm_multiple_interacciones)
 # y la media de veces que una persona batea
 fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Walks - 
 										Triples - Arbitration - Errors - 
-										Free_agent - HomeRuns + 
+										Free_agent - HomeRuns + Free_agency_eligibility*Runs_batted_in + 
 										Runs*Hits + Batting_average*`On-base_percentage`, 
 										data = baseball)
 
 summary(fit_lm_multiple_interacciones)
 
-# no ha funcionado, probamos otra combinacion, esta vez la interacción entre las
-# dos consideradas más significativas
-fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks - 
-										`On-base_percentage` - Triples - Arbitration - Errors - 
-										Free_agent - HomeRuns + Runs*Hits + 
-										Free_agency_eligibility * Runs_batted_in, 
-										data = baseball)
 
-summary(fit_lm_multiple_interacciones)
-
-# ha funcionado bastante bien, pasamos de un r^2 de 0.68 a uno de 0.7145
-
-# como la anterior ha funcionado, pruebo tambien Runs_batted_in con Arbitration_eligibility
+# pruebo tambien Runs_batted_in con Arbitration_eligibility
 fit_lm_multiple_interacciones <- lm(Salary ~ . - Doubles - Batting_average - Walks - 
 										`On-base_percentage` - Triples - Arbitration - Errors - 
 										Free_agent - HomeRuns + Runs*Hits + 
